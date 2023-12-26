@@ -14,6 +14,7 @@ It uses a simple json configuration file to add the things you want to watch
     - free space
     - Custom command
     - Securities
+- Add  Translation System
 
 
 # Features
