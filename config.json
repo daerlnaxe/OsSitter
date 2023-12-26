@@ -1,0 +1,31 @@
+{
+	"Parameters":
+	{	
+		"ServerName": "",
+		"Debug":true,
+		"Stop": false,
+		"Sleeper": 1, 		
+		"Mail":
+		{
+			"sender": "",
+			"smtp":{
+				"smtpstring": "",	
+				"port": 587,
+			    "auth": true,
+				"login": "",
+				"app-password": ""
+			},
+			"to":[
+			{
+				"name":"me",
+				"address": ""
+				
+			}
+			],
+			"cc":[],
+			"cci":[]			
+		}
+	},
+	
+	"Alertes": []
+}

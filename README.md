@@ -15,6 +15,7 @@ It uses a simple json configuration file to add the things you want to watch
     - Custom command
     - Securities
 - Add  Translation System
+- JSon rebuilder
 
 
 # Features
