@@ -64,19 +64,19 @@ class OsSitter:
         elif sys.platform.startswith('linux'):
             self.__osDetected="linux"
 
-        print( f"OS detecté: {self.osDetected}")
+        print( f"\tOS detecté: {self.osDetected}")
         # Chargement de la configuration
-        print("Chargement de la configuration")
+        print("\tChargement de la configuration")
                 
         self.__config= Config.Factory()
         self.__debugMode= self.config.parameters.debug
 
 
         if self.debugMode:
-            print("Debug mode activated")
+            print("\tDebug mode activated")
             
             print(self.config.__repr__())
-            print(f"Paramètres : {self.config.parameters}")
+            print(f"\tParamètres : {self.config.parameters}")
             # Affichage des paramètres mails
      
 
@@ -141,20 +141,37 @@ class OsSitter:
         mails.Send(mail_params.sender,f"Etat du serveur '{server_params.server_name}'" , message, mail_params);
 
 
+    """
+    Test 
+    """
     def test(self):
         print("Tests")        
         
+        # Check services names
+        for alert in self.config.alerts:
+            if alert.typeA =="service" :
+                if self.osDetected=="windows":
+                    raise NotImplementedError(self.__class__.__name__ )
+                elif self.osDetected == "linux":
+                    alert.state=Service.lin_checkname(alert.nom)
+                    
+                    
+        # Test mail - Si tout est ok
         mail_params=self.config.parameters.mail
         server_params=self.config.parameters
         # Creation of the object to send mails
         mails=Mails()
-        message =f"""Message de {server_params.server_name}: Supervision activée
+        message =f"""\tMessage de {server_params.server_name}: Supervision activée
         """
         print(mail_params.sender)
         #mails.Send(f"Etat du serveur '{server_params.server_name}'" , message, mail_params.sender, mail_params.get_toList(), mail_params.get_ccList(), mail_params.get_cciList());
         mails.Send(mail_params.sender,f"Initialisation de la surveillance de '{server_params.server_name}'" , message, mail_params);
             
-        print(f"envoi de mail")
+        print(f"\tenvoi de mail")
+
+
+                
+
 
 
     # Begining

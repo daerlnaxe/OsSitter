@@ -13,6 +13,21 @@ import sys
 #@staticmethod
 class Service:
     @staticmethod
+    def lin_checkname(varService: str):
+        #print(f"\tTest du nom de {varService}")
+        #subprocess.Popen(f"systemctl status {varService}",  shell=True,stdout=subprocess.PIPE)
+        check = subprocess.run(["systemctl", "status", varService], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        if (b"could not be found" in check.stderr):
+            print("\tTest échoué pour {varService}")
+            raise ValueError(">>>Le service est inconnu, veuillez modifier le fichier de configuration")
+            
+        print(f"\tTest réussi pour {varService}")
+                
+
+            
+        
+    @staticmethod
     def lin_checkservice(varService: str):
         print(f"Test de {varService}")
         check = subprocess.run(["systemctl", "is-active", varService], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
