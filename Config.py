@@ -1,3 +1,9 @@
+"""
+Auteur : Alexandre CODOUL
+Version: Alpha 1.2
+TODO:
+"""
+
 import json
 from typing import List
 from AlertClass import Alert

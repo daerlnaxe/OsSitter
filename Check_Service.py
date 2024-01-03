@@ -1,6 +1,6 @@
 """
 Auteur : Alexandre CODOUL
-Version: 1.0
+Version: Alpha 1.2
 TODO:
 - Add argument to replace $varService
 - Ajouter une compatibilité Windows
@@ -19,8 +19,8 @@ class Service:
         check = subprocess.run(["systemctl", "status", varService], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         if (b"could not be found" in check.stderr):
-            print("\tTest échoué pour {varService}")
-            raise ValueError(">>>Le service est inconnu, veuillez modifier le fichier de configuration")
+            print(f"\tTest échoué pour {varService}")
+            raise ValueError(f">>>Le service est inconnu {varService}, veuillez modifier le fichier de configuration")
             
         print(f"\tTest réussi pour {varService}")
                 

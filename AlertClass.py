@@ -1,3 +1,8 @@
+"""
+Auteur : Alexandre CODOUL
+Version: Alpha 1.2
+TODO:
+"""
 class Alert:
     # Alert Name
     @property

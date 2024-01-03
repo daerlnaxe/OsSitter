@@ -1,11 +1,11 @@
 # coding: utf-8
 """
-Créateur: Alexandre CODOUL
-Objet: Transmettre des mails
-Version: 1.0
+Creator: Alexandre CODOUL
+Objet: Transmit mails
+Version: Alpha 1.2
 
 Notes:
-    - Utilise version récente du protocole
+    - Using a current version of the protocol
 """
 
 import smtplib

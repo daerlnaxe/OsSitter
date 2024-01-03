@@ -3,7 +3,7 @@
 
 """
 Auteur: Alexandre Codoul
-Version: alpha 2
+Version: alpha 2.1
 Requiert Python 3.6
 Todo:
 - Horodatage -> module à part
@@ -13,12 +13,12 @@ Todo:
 Features:
 - Loop by /60s
 - Load new config file if there is a file named 'new-config.json'
-
+- Tests on init
 
 Linux :
-- Laisser tourner en fond : nohup ./OsSitter.py &
-- Voir le pid : ps -aux | grep OsSitter | grep -v grep
-- Tuer le processus : kill <pid>
+- Background launch : nohup ./OsSitter.py &
+- Seein pid : ps -aux | grep OsSitter | grep -v grep
+- Killing process : kill <pid>
 
 """
 
