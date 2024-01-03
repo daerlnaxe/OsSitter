@@ -30,9 +30,13 @@ from Config import Config
 from Check_Service import Service
 from SendMail import Mails
 from datetime import datetime, timedelta
+# Used to detect when stopped
+import atexit 
+# User to intercept sigkill and ...
+import signal
 
 
-class OsSitter:
+class OsSitter(object):
     @property
     def timeFormat(self):
         return "%Y-%m-%d %H:%M:%S"
@@ -51,10 +55,39 @@ class OsSitter:
     
     #debugMode=None
     
+    @staticmethod
+    def myself():
+        return self._instance
+    
+    def stop(sig, frame):
+        global stopped
+        stopped = True
+        out.write('caught SIGTERM\n')
+        out.flush()
+        ACiao()
 
+    def ignore(sig, frsma):
+        out.write('ignoring signal %d\n' % sig)
+        out.flush()
+        ACiao()
+
+
+
+    _instance = None       # Attribut statique de classe
+ 
+    def __new__(cls): # __new__ classmethod implicite: la classe 1e paramètre
+        print("méthode de construction standard")
+        if cls._instance is None:
+            print("construction")
+            cls._instance = object.__new__(cls)
+        return cls._instance
 
 
     def __init__(self):
+        signal.signal(signal.SIGTERM, self.stop)
+        signal.signal(signal.SIGHUP, self.ignore)
+
+    
         print("Initialisation : {}".format(datetime.now().strftime(self.timeFormat)))
         # Check OS
         # its win32, maybe there is win64 too?
@@ -107,7 +140,7 @@ class OsSitter:
     Attention le service '{alert.nom}' est stoppé !
              
             
-    Mail généré par Supervision.py
+    Mail généré par OsSitter.py
                     """
             print(mail_params.sender)
             #mails.Send(f"Etat du serveur '{server_params.server_name}'" , message, mail_params.sender, mail_params.get_toList(), mail_params.get_ccList(), mail_params.get_cciList());
@@ -134,11 +167,36 @@ class OsSitter:
     Attention le service '{alert.nom}' est redémarré !
              
             
-    Mail généré par Supervision.py
+    Mail généré par OsSitter.py
                     """
         print(mail_params.sender)
         #mails.Send(f"Etat du serveur '{server_params.server_name}'" , message, mail_params.sender, mail_params.get_toList(), mail_params.get_ccList(), mail_params.get_cciList());
         mails.Send(mail_params.sender,f"Etat du serveur '{server_params.server_name}'" , message, mail_params);
+
+
+    # Signal when program is stopped
+    # Using register() as a decorator  
+    @atexit.register  
+    def ACiao(): 
+        obj= OsSitter()
+        print(obj)
+        print(type(obj))
+        mail_params=obj.config.parameters.mail
+        server_params=obj.config.parameters
+
+        mails=Mails()
+        print(f"Envoi de mail Arrêt du programme")
+        message =f"""Message de {server_params.server_name}:
+                    
+    Arrêt de OsSitter à {datetime.now()} !
+             
+    Le serveur n'est plus surveillé ou a été redémarré.
+                    """
+       
+        mails.Send(mail_params.sender,f"Arrêt du serveur '{server_params.server_name}'" , message, mail_params);
+     
+
+
 
 
     """
@@ -161,7 +219,7 @@ class OsSitter:
         server_params=self.config.parameters
         # Creation of the object to send mails
         mails=Mails()
-        message =f"""\tMessage de {server_params.server_name}: Supervision activée
+        message =f"""\Supervision activée sur de {server_params.server_name}.
         """
         print(mail_params.sender)
         #mails.Send(f"Etat du serveur '{server_params.server_name}'" , message, mail_params.sender, mail_params.get_toList(), mail_params.get_ccList(), mail_params.get_cciList());
@@ -294,7 +352,13 @@ class OsSitter:
             time.sleep(self.config.parameters.sleeper * 60)
             
     
+        print("don't stop me now")
+
+
+# Starting point    
 if __name__ == '__main__':    
     sup = OsSitter()
     sup.test()
+    
+    # Sys.exit to signal why
     sys.exit(sup.main())  # need to bettter use sys.exit
