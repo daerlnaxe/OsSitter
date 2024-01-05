@@ -42,7 +42,7 @@ class SMTP_Obj:
     def password(self):
         return self.__password
     
-    def __init__(self, smtpstring: str, port: int, auth: bool, login: str, password: str):
+    def __init__(self,smtpstring: str, port: int, auth: bool, login: str, password: str):
         self.__smtpstring = smtpstring
         self.__port = port
         self.__auth = auth
@@ -80,6 +80,10 @@ class Mail_Obj:
 # Object with all parameters for mails
 class Mail_Block:
     @property
+    def mute_mode(self):
+        return self.__mutemode
+        
+    @property
     def sender(self):
         return self.__sender
 
@@ -99,7 +103,8 @@ class Mail_Block:
     def cci(self):
         return self.__cci
     
-    def __init__(self, sender: str, smtobj: SMTP_Obj,to: List[Mail_Obj], cc: List[Mail_Obj], cci: List[Mail_Obj]):
+    def __init__(self, mutemode: bool, sender: str, smtobj: SMTP_Obj,to: List[Mail_Obj], cc: List[Mail_Obj], cci: List[Mail_Obj]):
+        self.__mutemode=mutemode
         self.__sender=sender
         self.__smtpobj=SMTP_Obj.dict_toSMTPObj(smtobj)
         self.__to=to
@@ -109,7 +114,7 @@ class Mail_Block:
     @classmethod
     def dict_toMailBlock(self, adict:dict):
         # Return an empty list if None
-        return Mail_Block(adict["sender"],adict["smtp"], adict["to"], adict["cc"], adict["cci"])
+        return Mail_Block(adict["mutemode"],adict["sender"],adict["smtp"], adict["to"], adict["cc"], adict["cci"])
 
 
     def get_toList(self):
@@ -139,7 +144,11 @@ class Mail_Block:
         else:
             return None
             
-            
+    """
+    Showing Content 
+    """        
+    def __repr__(self):
+        return str(self.__dict__)
 
 				
             
@@ -148,6 +157,9 @@ class Mail_Block:
 class Mails:
 #    def Send(self, subject:str ,message: str, sender: str, receiver : list, receiverCC:list = None, receiverCCI:list = None):
     def Send(self, sender: str, subject:str ,message: str, mail_params:Mail_Block ):
+        if mail_params.mute_mode:
+            print(f"----> MuteMode: Envoi annulé pour {subject}")
+            return
         
         msg = EmailMessage()
 
@@ -186,3 +198,5 @@ class Mails:
         #Dernières versions de Python
         mailserver.send_message(msg)
         mailserver.quit()
+
+        print(f"----- Envoi de mail {subject}")

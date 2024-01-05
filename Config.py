@@ -5,10 +5,12 @@ TODO:
 """
 
 import json
+import DxHelios
 from typing import List
 from AlertClass import Alert
 from SendMail import Mail_Block, Mail_Obj
 from datetime import datetime, timedelta
+
 
       
 
@@ -51,8 +53,12 @@ class Parameters_Obj:
     @classmethod
     def filler(Stop:bool, Sleeper: int, Mail: Mail_Block):
         return Parameters_Obj(Sleeper, Stop, Mail)
-        
-        
+    
+    """
+    Showing Content 
+    """        
+    def __repr__(self):
+        return str(self.__dict__)    
 
 # Root for config object
 class Config:
@@ -72,15 +78,14 @@ class Config:
 
         #
         self.__Alerts = []
-        print(type(self.__Alerts))
+        
         for item in Alertes:
-            #print(item)
-            print(type(item))
             self.__Alerts.append (Alert.dict_toAlert( item))
         
-        
     
-    # Affichage du contenu
+    """
+    Showing Content 
+    """
     def __repr__(self):
         return str(self.__dict__)
         
@@ -117,11 +122,11 @@ class Config:
 
     # create Factory static method
     @staticmethod
-    def Factory():
+    def Factory(filePath):
         
-        print("Chargement du fichier de configuration")
+        print(f"Chargement du fichier de configuration: {filePath}")
             
-        with open("config.json", "r") as f:
+        with open(filePath, "r") as f:
             json_data = f.read()
 
         #print(json_data)

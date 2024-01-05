@@ -3,10 +3,12 @@
 	{	
 		"ServerName": "",
 		"Debug":true,
+
 		"Stop": false,
 		"Sleeper": 1, 		
 		"Mail":
 		{
+			"mutemode": false,
 			"sender": "",
 			"smtp":{
 				"smtpstring": "",	

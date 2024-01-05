@@ -37,9 +37,7 @@ class Alert:
     #Next alarm
     next_alarm=None
     
-    def __init__(self,nom: str,typeA: str, timer: int, delay_alarm: int):
-        print("meee")
-        print(delay_alarm)
+    def __init__(self,nom: str,typeA: str, timer: int, delay_alarm: int):                
         self.__nom = nom
         self.__typeA=typeA
         self.__timer=timer
@@ -50,3 +48,8 @@ class Alert:
         return Alert(adict["nom"], adict["typeA"], adict["timer"], adict["delay_alarm"])
         
    
+    """
+    Showing Content 
+    """        
+    def __repr__(self):
+        return str(self.__dict__)

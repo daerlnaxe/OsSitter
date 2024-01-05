@@ -19,10 +19,10 @@ class Service:
         check = subprocess.run(["systemctl", "status", varService], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         if (b"could not be found" in check.stderr):
-            print(f"\tTest échoué pour {varService}")
+            print(f"\tTest du nom pour le service {varService} : echec")
             raise ValueError(f">>>Le service est inconnu {varService}, veuillez modifier le fichier de configuration")
             
-        print(f"\tTest réussi pour {varService}")
+        print(f"\tTest du nom pour le service {varService} : réussi")
                 
 
             

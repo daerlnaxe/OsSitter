@@ -25,6 +25,7 @@ Linux :
 import os
 import sys
 import time 
+import DxHelios
 from AlertClass import Alert
 from Config import Config
 from Check_Service import Service
@@ -35,11 +36,6 @@ import atexit
 # User to intercept sigkill and ...
 import signal
 
-
-def term_func(signum, frame):
-    global is_shutdown
-    is_shutdown = True
-    print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_func')
 
 
 
@@ -65,10 +61,18 @@ class OsSitter(object):
     @staticmethod
     def myself():
         return self._instance
+        
+    def term_func(self, signum, frame):
+        #global is_shutdown
+        print(frame)
+        print(signum)
+        #is_shutdown = True
+        print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_func')
 
+    
 
     def term_method(self, signum, frame):
-        print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM reçu')
+        print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_method')
         mail_params=self.config.parameters.mail
         server_params=self.config.parameters
 
@@ -99,9 +103,9 @@ class OsSitter(object):
     _instance = None       # Attribut statique de classe
  
     def __new__(cls): # __new__ classmethod implicite: la classe 1e paramètre
-        print("méthode de construction standard")
+        #méthode de construction standard
         if cls._instance is None:
-            print("construction")
+            print("CLS: construction")
             # Get directory
             cls.__directory=os.path.dirname(os.path.realpath(__file__))
         
@@ -109,12 +113,10 @@ class OsSitter(object):
         return cls._instance
 
 
-
-
-
     def __init__(self):
-       
-        print("Initialisation : {}".format(datetime.now().strftime(self.timeFormat)))
+        #me=__class__.__name__
+        DxHelios.Say(self, "Initialisation à {}".format(datetime.now().strftime(self.timeFormat)));
+        #print("Initialisation : {}".format(datetime.now().strftime(self.timeFormat)))
         # Check OS
         # its win32, maybe there is win64 too?
 
@@ -123,24 +125,28 @@ class OsSitter(object):
         elif sys.platform.startswith('linux'):
             signal.signal(signal.SIGTERM, self.term_method)
             self.__osDetected="linux"
-            
-        print( f"\tOS detecté: {self.osDetected}")
+        DxHelios.Say(self, f"OS detecté: {self.osDetected}", ind_mess= 1)
+        #print( f"\tOS detecté: {self.osDetected}")
 
         
         # Chargement de la configuration
-        print("\tChargement de la configuration")
-                
+        DxHelios.Say(self, f"Chargement de la configuration", ind_mess= 1)
+        #print("\tChargement de la configuration")                
         self.__config= Config.Factory(os.path.join( self.__directory, "config.json"  ))
+
         self.__debugMode= self.config.parameters.debug
 
         #linux < useless if decorator used
         atexit.register(self.ACiaoi)
 
-        if self.debugMode:
-            print("\tDebug mode activated")
+        if self.debugMode:            
+            DxHelios.ShowParams(self, "Représentation de la configuration", self, self.config)
+            #print("\tReprésentation de la configuration: ",self.config.__repr__()) # fonctionnel
             
-            print(self.config.__repr__())
-            print(f"\tParamètres : {self.config.parameters}")
+            DxHelios.ShowParams(self, "Représentation des Paramètres", self, self.config.parameters)
+                        
+            DxHelios.ShowParams(self, "Représentation des Alertes:", self, self.config.alerts)
+           
             # Affichage des paramètres mails
      
 
@@ -224,7 +230,6 @@ class OsSitter(object):
        
         mails.Send(mail_params.sender,f"Arrêt du serveur '{server_params.server_name}'" , message, mail_params);
      
-        print(f"------------ Envoi de mail Arrêt du programme")
 
 
 
@@ -232,7 +237,7 @@ class OsSitter(object):
     Test 
     """
     def test(self):
-        print("Tests")        
+        print(">>> Tests <<<")        
         
         # Check services names
         for alert in self.config.alerts:
@@ -254,13 +259,9 @@ class OsSitter(object):
         #mails.Send(f"Etat du serveur '{server_params.server_name}'" , message, mail_params.sender, mail_params.get_toList(), mail_params.get_ccList(), mail_params.get_cciList());
         mails.Send(mail_params.sender,f"Initialisation de la surveillance de '{server_params.server_name}'" , message, mail_params);
             
-        print(f"\tenvoi de mail")
-
-               
-
-
-
-    # Begining
+    """
+    Begining
+    """
     def main(self):
         # Assign
         server_params=self.config.parameters
@@ -387,11 +388,9 @@ class OsSitter(object):
         print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Destruction de l'objet OsSitter")
 
 
-                
-
-
-
-# Starting point    
+"""
+Starting point    
+"""
 if __name__ == '__main__':    
     sup = OsSitter()
     sup.test()
