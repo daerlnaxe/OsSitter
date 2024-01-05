@@ -36,6 +36,13 @@ import atexit
 import signal
 
 
+def term_func(signum, frame):
+    global is_shutdown
+    is_shutdown = True
+    print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_func')
+
+
+
 class OsSitter(object):
     @property
     def timeFormat(self):
@@ -58,36 +65,55 @@ class OsSitter(object):
     @staticmethod
     def myself():
         return self._instance
+
+
+    def term_method(self, signum, frame):
+        print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM reçu')
+        mail_params=self.config.parameters.mail
+        server_params=self.config.parameters
+
+        mails=Mails()
+        
+        message =f"""{server_params.server_name} :
+                    
+    OsSitter a reçu un SIGTERM à {datetime.now()} !
+             
+    Le serveur n'est plus surveillé ou a été redémarré.
+                    """
+       
+        mails.Send(mail_params.sender,f"Réception d'un SIGTERM pour '{server_params.server_name}'" , message, mail_params);
+     
+        print(f"------------ Envoi de mail SIGTERM")
+        self.__stopped=True
+     
+        
     
-    def stop(sig, frame):
-        global stopped
-        stopped = True
-        out.write('caught SIGTERM\n')
-        out.flush()
-        ACiao()
 
-    def ignore(sig, frsma):
-        out.write('ignoring signal %d\n' % sig)
-        out.flush()
-        ACiao()
+    # Used to quit loop
+    __stopped=False
+    
+    # Directory path
+    __directory=None    
 
-
-
+    # idk
     _instance = None       # Attribut statique de classe
  
     def __new__(cls): # __new__ classmethod implicite: la classe 1e paramètre
         print("méthode de construction standard")
         if cls._instance is None:
             print("construction")
+            # Get directory
+            cls.__directory=os.path.dirname(os.path.realpath(__file__))
+        
             cls._instance = object.__new__(cls)
         return cls._instance
 
 
-    def __init__(self):
-        signal.signal(signal.SIGTERM, self.stop)
-        signal.signal(signal.SIGHUP, self.ignore)
 
-    
+
+
+    def __init__(self):
+       
         print("Initialisation : {}".format(datetime.now().strftime(self.timeFormat)))
         # Check OS
         # its win32, maybe there is win64 too?
@@ -95,15 +121,20 @@ class OsSitter(object):
         if sys.platform.startswith('win'):
             self.__osDetected="windows"
         elif sys.platform.startswith('linux'):
+            signal.signal(signal.SIGTERM, self.term_method)
             self.__osDetected="linux"
-
+            
         print( f"\tOS detecté: {self.osDetected}")
+
+        
         # Chargement de la configuration
         print("\tChargement de la configuration")
                 
-        self.__config= Config.Factory()
+        self.__config= Config.Factory(os.path.join( self.__directory, "config.json"  ))
         self.__debugMode= self.config.parameters.debug
 
+        #linux < useless if decorator used
+        atexit.register(self.ACiaoi)
 
         if self.debugMode:
             print("\tDebug mode activated")
@@ -174,18 +205,16 @@ class OsSitter(object):
         mails.Send(mail_params.sender,f"Etat du serveur '{server_params.server_name}'" , message, mail_params);
 
 
-    # Signal when program is stopped
+    # Signal when program is stopped < doesn't work for shutdown PC
     # Using register() as a decorator  
-    @atexit.register  
-    def ACiao(): 
-        obj= OsSitter()
-        print(obj)
-        print(type(obj))
-        mail_params=obj.config.parameters.mail
-        server_params=obj.config.parameters
+    #@atexit.register  
+    def ACiaoi(self):
+        self.__stopped=True
+        mail_params=self.config.parameters.mail
+        server_params=self.config.parameters
 
         mails=Mails()
-        print(f"Envoi de mail Arrêt du programme")
+        
         message =f"""Message de {server_params.server_name}:
                     
     Arrêt de OsSitter à {datetime.now()} !
@@ -195,7 +224,7 @@ class OsSitter(object):
        
         mails.Send(mail_params.sender,f"Arrêt du serveur '{server_params.server_name}'" , message, mail_params);
      
-
+        print(f"------------ Envoi de mail Arrêt du programme")
 
 
 
@@ -227,8 +256,7 @@ class OsSitter(object):
             
         print(f"\tenvoi de mail")
 
-
-                
+               
 
 
 
@@ -259,7 +287,7 @@ class OsSitter(object):
         #config.InitAlerts(datetime.now())
 
 
-        while(True):
+        while(not self.__stopped):#not self.__stopped):
 
             
             if os.path.isfile("./new-config.json"):
@@ -353,6 +381,14 @@ class OsSitter(object):
             
     
         print("don't stop me now")
+
+    # body of destructor
+    def __del__(self):
+        print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Destruction de l'objet OsSitter")
+
+
+                
+
 
 
 # Starting point    
