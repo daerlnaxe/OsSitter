@@ -2,7 +2,7 @@
 """
 Creator: Alexandre CODOUL
 Objet: Transmit mails
-Version: Alpha 1.2
+Version: Alpha 4
 
 Notes:
     - Using a current version of the protocol
@@ -82,6 +82,10 @@ class Mail_Block:
     @property
     def mute_mode(self):
         return self.__mutemode
+        
+    @mute_mode.setter
+    def mute_mode(self,value):
+        self.__mutemode=value
         
     @property
     def sender(self):

@@ -1,6 +1,6 @@
 """
 Auteur : Alexandre CODOUL
-Version: Alpha 2
+Version: Alpha 4
 TODO:
 - Add argument to replace $varService
 - Ajouter une compatibilité Windows
