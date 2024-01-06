@@ -1,3 +1,51 @@
 {
-	"timeinit": "Initialisation à"
+	"lang_version":"1.0",
+		
+	"failed": "failed",	
+	"mute_mode": "mute mode",	
+	"service":"Service",
+	"sleep_param":"Wake me up in",
+	"starting":"Démarrage",
+	"states":"Etats",
+	"state_ok":"Opérationnel",
+	"state_stpd":"Stoppé",
+	"state_rst":"Redémarré",
+	"success":"success",
+	
+	"det_os": "OS détecté",
+	"init_time": "Initialisation à",
+	"lnch_tests":"Lancement des tests",
+	"modify_conf":"veuillez modifier le fichier de configuration",
+	"time":"Il est",
+	"typeof":"de type",	
+	
+	"load_cfg":"Chargement de la configuration",
+	"load_newcfg":"Chargement d'une nouvelle configuration",
+	
+	"repr_conf":"Représentation de la configuration:",
+	"repr_params":"Représentation des Paramètres:",
+	"repr_alerts":"Représentation des Alertes:",
+	"repr_mails":"Représentation paramètres mail:",
+	
+	"err_cfgload":"Erreur de chargement du nouveau fichier, chargement refusé",
+	"err_unknownservice":"Le service est inconnu",
+	"err_value":"La valeur entrée ne correspond pas à ce qui est attendu",
+	
+	"alert_handl":"Traitement de l'alerte",
+	
+	"mail_supactivated":"Supervision activée sur",
+		
+	"next_exec": "Réglage de l'éxécution de",
+	"next_execset":"Réglage de la prochaine éxécution :",
+	
+	"service_nextchk":"Prochain check du service",
+	"service_test":"Test du nom pour le service",
+	
+	
+	
+	
+	"destruct":"Destruction de l'objet"
+	
+	
+	
 }

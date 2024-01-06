@@ -21,11 +21,14 @@ def Say (who, message: str, ind_class=0, ind_mess=0):
 def Debug (who, message: str, ind_class=0, ind_mess=0):   
     print(f"{get_sender(who)}"+"\t"*ind_class+" | " + "\t"*ind_mess + "--Debug-- " + message)
 
+def Error (who, message):
+    print(">"*20+ get_sender(who))
+    print(message)
 
 # write a title like #### who - bable ###
 def Title(who , title):
     mult=14
-    print('#'*mult+f"{get_sender(who)}" + " - " + title +'#'*mult)
+    print('#'*mult+f" {get_sender(who)} - {title} " +'#'*mult)
 
 
 # Draw a line

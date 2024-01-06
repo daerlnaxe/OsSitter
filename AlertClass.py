@@ -1,6 +1,6 @@
 """
 Auteur : Alexandre CODOUL
-Version: Alpha 1.2
+Version: Alpha 1.3
 TODO:
 """
 class Alert:

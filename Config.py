@@ -1,6 +1,6 @@
 """
 Auteur : Alexandre CODOUL
-Version: Alpha 1.2
+Version: Alpha 1.3
 TODO:
 """
 
@@ -95,7 +95,7 @@ class Config:
     def InitAlerts(self, initTime: datetime):
         for alert in self.__Alerts:
             alert.next_execution=initTime
-            print(f"{alert.nom} : {alert.next_execution}")
+            #print(f"{alert.nom} : {alert.next_execution}")
             
     def set_nextexecution(self, alert: Alert):
         alert.next_execution = datetime.now() + timedelta(minutes=alert.timer)

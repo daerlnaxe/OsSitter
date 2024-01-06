@@ -69,6 +69,10 @@ class OsSitter(object):
     def alerts(self):
         return self.__alerts
         
+    @property
+    def srvc(self):
+        return self.__srvc
+        
     #debugMode=None
     
     @staticmethod
@@ -137,13 +141,10 @@ class OsSitter(object):
         print('#' + ' '*50 + '#')
         print('#'*52)
         
-        global lang
-        # Load language (dict)
-        with open("./currentlang.json", "r") as read_file:
-            lang = json.load(read_file)        
+        self.InitLanguage()
         
         
-        DxHelios.Say(self, "{} {}".format(lang['timeinit'],datetime.now().strftime(self.timeFormat)));
+        DxHelios.Say(self, "{} {}".format(lang['init_time'],datetime.now().strftime(self.timeFormat)));
         #print("Initialisation : {}".format(datetime.now().strftime(self.timeFormat)))
    
         # Check OS
@@ -153,7 +154,8 @@ class OsSitter(object):
         elif sys.platform.startswith('linux'):
             signal.signal(signal.SIGTERM, self.term_method)
             self.__osDetected="linux"
-        DxHelios.Say(self, f"OS detecté: {self.osDetected}", ind_mess= 1)
+            
+        DxHelios.Say(self, f"{lang['det_os']}: {self.osDetected}", ind_mess= 1)
 
         # Load and init configuration
         self.InitConfig()
@@ -161,6 +163,18 @@ class OsSitter(object):
         # Register to intercept ctrl+c
         #linux < useless if decorator used
         atexit.register(self.ACiaoi)
+        
+        # 
+        self.__srvc=Service(lang, self.osDetected)
+
+    """ Initialize Language
+    """
+    def InitLanguage(self, fileName="./currentlang.json", reload=False):
+        global lang
+        # Load language (dict)
+        with open(fileName, "r") as read_file:
+            lang = json.load(read_file)   
+
 
 
     """ Initialize Configuration
@@ -168,10 +182,10 @@ class OsSitter(object):
     def InitConfig(self, fileName="./config.json", reload=False):
         # Chargement de la configuration
         if not reload:
-            DxHelios.Say(self, f"Chargement de la configuration", ind_mess= 1)
+            DxHelios.Say(self, f"{lang['load_cfg']}", ind_mess= 1)
             self.__config= Config.Factory(os.path.join( self.__directory, fileName  ))
         else:  
-            DxHelios.Say(self, f"Chargement nouvelle configuration", ind_mess= 1)
+            DxHelios.Say(self, f"{lang['load_newcfg']}", ind_mess= 1)
             try:
                 self.__config= Config.Factory(os.path.join( self.__directory, fileName  ))
                 
@@ -182,7 +196,7 @@ class OsSitter(object):
                 # self.__config=new_config
                 # self.__debugMode = server_params.debug
             except Exception as exc:
-                print("Erreur de chargement du nouveau fichier, chargement refusé")
+                DxHelios.Error(self,f"{lang['err_cfgload']}")
                 print(exc)
                 return False
             
@@ -198,16 +212,11 @@ class OsSitter(object):
         self.__config.InitAlerts(datetime.now())
         
         if self.debugMode:            
-            DxHelios.ShowParams(self, "Représentation de la configuration", self, self.config, True)
+            DxHelios.ShowParams(self, lang['repr_conf'], self, self.config, True)
             #print("\tReprésentation de la configuration: ",self.config.__repr__()) # fonctionnel
-            
-            DxHelios.ShowParams(self, "Représentation des Paramètres", self, self.srv_params, True)
-                        
-            DxHelios.ShowParams(self, "Représentation des Alertes:", self, self.alerts, True)
-           
-            DxHelios.ShowParams(self, "Représentation paramètres mail:", self, self.mail_params, True)
-
-
+            DxHelios.ShowParams(self, lang['repr_params'], self, self.srv_params, True)
+            DxHelios.ShowParams(self, lang['repr_alerts'], self, self.alerts, True)
+            DxHelios.ShowParams(self, lang['repr_mails'], self, self.mail_params, True)
 
         return True
 
@@ -302,35 +311,33 @@ class OsSitter(object):
     """ Self Test 
     """
     def test(self):
-        print(">>> Tests <<<")        
+        DxHelios.Title(self, "Tests")        
+        DxHelios.Say(self, lang['lnch_tests'])
         
         # Check services names
         for alert in self.config.alerts:
             if alert.typeA =="service" :
-                if self.osDetected=="windows":
-                    raise NotImplementedError(self.__class__.__name__ )
-                elif self.osDetected == "linux":
-                    alert.state=Service.lin_checkname(alert.nom)
+                alert.state=self.srvc.checkname(alert.nom)
                     
-                    
-        # Test mail - Si tout est ok
-        subject=f"Initialisation de la surveillance de '{server_params.server_name}'"
-        message =f"""Supervision activée sur {server_params.server_name}.
+        # Test mail - if everything is ok
+        mails=Mails()
+        subject=f"{lang['mail_supactivated']} '{self.srv_params.server_name}'"
+        message =f"""{lang['mail_supactivated']} {self.srv_params.server_name}.
         """
-                
-        mails.Send(mail_params.sender, subject , message, mail_params);
+        mails.Send(self.mail_params.sender, subject , message, self.mail_params);
             
             
     """ Begining
     """
     def main(self):
-        print("Démarrage : {}".format(datetime.now().strftime(self.timeFormat)))
+        DxHelios.Jump()
+        DxHelios.Title(self, "Run")        
 
-        # Initialisation
-        obj=datetime.now()
+        DxHelios.Say(self, "{} : {}".format(lang['starting'],datetime.now().strftime(self.timeFormat)))
 
         """
         import inspect
+        obj=datetime.now()
         for attr in inspect.getmembers(obj):
             # Avoiding dunder methods
             if not attr[0].startswith("__"):
@@ -339,7 +346,8 @@ class OsSitter(object):
             #result = map (lambda x:x['address'], mail_params.to)
 
         while(not self.__stopped):
-
+            DxHelios.Say(self,"{} {}".format(lang['time'],datetime.now()))
+            
             # Force to reload a new configuration file
             if os.path.isfile("./new-config.json"):
                 InitConfig("./new-config.json",reload=True)
@@ -355,11 +363,8 @@ class OsSitter(object):
             # Alerts
             for alert in self.config.alerts:
                 # Debug Mode -> show alert informations
-                if self.debugMode:
-                    print("typealerte")
-                    print(type(alert))
-                    print("Il est: {}".format(datetime.now()))
-                    print(f"Prochaine éxécution: {alert.next_execution}")
+                if self.debugMode:                    
+                    DxHelios.Debug(self,f"{lang['next_exec']} {alert.nom}: {alert.next_execution}")
 
                 # Traitement de l'alerte
                 if alert.typeA =="service" :
@@ -367,54 +372,51 @@ class OsSitter(object):
                     # Check alert
                     #alert.next_execution == None or 
                     if  datetime.now() >= alert.next_execution :            
-                        print(f"Traitement de l'alerte {alert.nom} de type {alert.typeA}")
+                        DxHelios.Say(self, f"{lang['alert_handl']} {alert.nom} {lang['typeof']}: {alert.typeA}",0,1)
                    
                                     
-                        if self.osDetected=="windows":
-                            raise NotImplementedError(self.__class__.__name__ ) 
-                        elif self.osDetected == "linux":
-                            alert.state=Service.lin_checkservice(alert.nom)
+                        alert.state=self.srvc.checkservice(alert.nom)
                         
                         self.config.set_nextexecution(alert)
-                        print(f"Réglage de la prochaine éxécution : {alert.next_execution}")
+                        DxHelios.Say(self, f"{lang['next_execset']} {alert.next_execution}",0,1)
 
                         # Gestion du check    
                         if self.debugMode:
-                            print(f"Etats, check: {alert.state} | old_state: {old_state}")
+                            DxHelios.Debug(self, f"{lang['states']}, check: {alert.state} | old_state: {old_state}")
                            
 
                     # No check                    
                     else:
-                        print(f"Prochain check du service {alert.nom} : {alert.next_execution}")
-                    
+                        DxHelios.Say(self, f"{lang['service_nextchk']} {alert.nom}: {alert.next_execution}",0,1)
+
+                                       
                     
                     if old_state==None:
                         old_state=alert.state
 
                     # Alerting
                     if old_state and alert.state:
-                        print(f"Service {alert.nom}: opérationnel")
+                        DxHelios.Say(self,f"{lang['service']} {alert.nom}: {lang['state_ok']}",0,1)
                     elif old_state is False and alert.state:                    
-                        print(f"Service {alert.nom}: redémarré")
+                        DxHelios.Say(self,f"{lang['service']} {alert.nom}: {lang['state_rst']}",0,1)
                         self.manage_restartedservice( alert)                
                     elif alert.state is False:  
-                        print(f"Service {alert.nom}: stoppé")
+                        DxHelios.Say(self,f"{lang['service']} {alert.nom}: {lang['state_stpd']}",0,1)
                         self.manage_stoppedservice( alert)
                     else:
-                        raise ValueError("Le paramètre entré ne correspond pas au type attendu")                
+                        raise ValueError(lang['err_value'])                
                                     
                         
                     
             # Time to Sleep (see 
-            print(f"Wake me up in {self.config.parameters.sleeper * 60 }s\n\n")
+            DxHelios.Say(self,f"{lang['sleep_param']} {self.config.parameters.sleeper * 60 }s\n\n")
             time.sleep(self.config.parameters.sleeper * 60)
             
     
-        print("don't stop me now")
 
     # body of destructor
     def __del__(self):
-        print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Destruction de l'objet OsSitter")
+        DxHelios.Title(self, f"{lang['destruct']} {self.__class__.__name__}")
 
 
 """
