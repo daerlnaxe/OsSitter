@@ -89,7 +89,9 @@ class Config:
     def __repr__(self):
         return str(self.__dict__)
         
-        
+    """
+    Initialize the next execution for alerts
+    """    
     def InitAlerts(self, initTime: datetime):
         for alert in self.__Alerts:
             alert.next_execution=initTime
@@ -123,8 +125,7 @@ class Config:
     # create Factory static method
     @staticmethod
     def Factory(filePath):
-        
-        print(f"Chargement du fichier de configuration: {filePath}")
+        DxHelios.Say("Config", f"Chargement du fichier de configuration: {filePath}",1)
             
         with open(filePath, "r") as f:
             json_data = f.read()

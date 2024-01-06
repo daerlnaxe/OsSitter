@@ -24,7 +24,8 @@ Linux :
 
 import os
 import sys
-import time 
+import time
+import json 
 import DxHelios
 from AlertClass import Alert
 from Config import Config
@@ -53,9 +54,21 @@ class OsSitter(object):
         return self.__config
     
     @property
+    def srv_params(self):
+        return self.__srv_params
+        
+    @property
     def debugMode(self):
         return self.__debugMode
     
+    @property
+    def mail_params(self):
+        return self.__mail_params
+    
+    @property
+    def alerts(self):
+        return self.__alerts
+        
     #debugMode=None
     
     @staticmethod
@@ -112,51 +125,106 @@ class OsSitter(object):
             cls._instance = object.__new__(cls)
         return cls._instance
 
-
+    """ Constructor
+    """
     def __init__(self):
-        #me=__class__.__name__
-        DxHelios.Say(self, "Initialisation à {}".format(datetime.now().strftime(self.timeFormat)));
+        # Prez
+        print('#'*52)
+        print('#' + ' '*50 + '#')
+        
+        #OsSitter: 8 chars
+        print('#' +' '*21 +  "OsSitter" +' '*21+ '#')
+        print('#' + ' '*50 + '#')
+        print('#'*52)
+        
+        global lang
+        # Load language (dict)
+        with open("./currentlang.json", "r") as read_file:
+            lang = json.load(read_file)        
+        
+        
+        DxHelios.Say(self, "{} {}".format(lang['timeinit'],datetime.now().strftime(self.timeFormat)));
         #print("Initialisation : {}".format(datetime.now().strftime(self.timeFormat)))
+   
         # Check OS
         # its win32, maybe there is win64 too?
-
         if sys.platform.startswith('win'):
             self.__osDetected="windows"
         elif sys.platform.startswith('linux'):
             signal.signal(signal.SIGTERM, self.term_method)
             self.__osDetected="linux"
         DxHelios.Say(self, f"OS detecté: {self.osDetected}", ind_mess= 1)
-        #print( f"\tOS detecté: {self.osDetected}")
 
-        
-        # Chargement de la configuration
-        DxHelios.Say(self, f"Chargement de la configuration", ind_mess= 1)
-        #print("\tChargement de la configuration")                
-        self.__config= Config.Factory(os.path.join( self.__directory, "config.json"  ))
+        # Load and init configuration
+        self.InitConfig()
 
-        self.__debugMode= self.config.parameters.debug
-
+        # Register to intercept ctrl+c
         #linux < useless if decorator used
         atexit.register(self.ACiaoi)
 
+
+    """ Initialize Configuration
+    """
+    def InitConfig(self, fileName="./config.json", reload=False):
+        # Chargement de la configuration
+        if not reload:
+            DxHelios.Say(self, f"Chargement de la configuration", ind_mess= 1)
+            self.__config= Config.Factory(os.path.join( self.__directory, fileName  ))
+        else:  
+            DxHelios.Say(self, f"Chargement nouvelle configuration", ind_mess= 1)
+            try:
+                self.__config= Config.Factory(os.path.join( self.__directory, fileName  ))
+                
+                # --
+                os.remove("./config.json")
+                os.rename("./new-config.json", "./config.json")
+                #new_config= Config.Factory()
+                # self.__config=new_config
+                # self.__debugMode = server_params.debug
+            except Exception as exc:
+                print("Erreur de chargement du nouveau fichier, chargement refusé")
+                print(exc)
+                return False
+            
+        
+
+        # Assignation
+        self.__srv_params=self.config.parameters
+        self.__debugMode= self.config.parameters.debug        
+        self.__mail_params =  self.config.parameters.mail
+        self.__alerts =  self.config.alerts
+        
+        # Set the next time alert
+        self.__config.InitAlerts(datetime.now())
+        
         if self.debugMode:            
-            DxHelios.ShowParams(self, "Représentation de la configuration", self, self.config)
+            DxHelios.ShowParams(self, "Représentation de la configuration", self, self.config, True)
             #print("\tReprésentation de la configuration: ",self.config.__repr__()) # fonctionnel
             
-            DxHelios.ShowParams(self, "Représentation des Paramètres", self, self.config.parameters)
+            DxHelios.ShowParams(self, "Représentation des Paramètres", self, self.srv_params, True)
                         
-            DxHelios.ShowParams(self, "Représentation des Alertes:", self, self.config.alerts)
+            DxHelios.ShowParams(self, "Représentation des Alertes:", self, self.alerts, True)
            
-            # Affichage des paramètres mails
-     
+            DxHelios.ShowParams(self, "Représentation paramètres mail:", self, self.mail_params, True)
+
+
+
+        return True
+
+
 
      
 
+    """ Mails - Part
+    
+    """
+    def Send_Mail():
+
+        mails=Mails()
+        mails.Send(mail_params.sender,f"Etat du serveur '{server_params.server_name}'" , message, mail_params);
+    
     # Send a mail "stopped service"
     def manage_stoppedservice(self, alert: Alert):
-        mail_params=self.config.parameters.mail
-        server_params=self.config.parameters
-
         
         print("manage stopped service")
         print(alert.next_alarm)
@@ -194,10 +262,7 @@ class OsSitter(object):
 
     # Send a mail "restarted service"
     def manage_restartedservice(self, alert: Alert):
-        mail_params=self.config.parameters.mail
-        server_params=self.config.parameters
 
-        mails=Mails()
         print(f"{alert.nom} envoi de mail restarted")
         message =f"""Message de {server_params.server_name}:
                     
@@ -206,11 +271,14 @@ class OsSitter(object):
             
     Mail généré par OsSitter.py
                     """
-        print(mail_params.sender)
         #mails.Send(f"Etat du serveur '{server_params.server_name}'" , message, mail_params.sender, mail_params.get_toList(), mail_params.get_ccList(), mail_params.get_cciList());
         mails.Send(mail_params.sender,f"Etat du serveur '{server_params.server_name}'" , message, mail_params);
 
-
+    """
+    Mails - End Part
+    """
+    
+    
     # Signal when program is stopped < doesn't work for shutdown PC
     # Using register() as a decorator  
     #@atexit.register  
@@ -231,10 +299,7 @@ class OsSitter(object):
         mails.Send(mail_params.sender,f"Arrêt du serveur '{server_params.server_name}'" , message, mail_params);
      
 
-
-
-    """
-    Test 
+    """ Self Test 
     """
     def test(self):
         print(">>> Tests <<<")        
@@ -249,33 +314,20 @@ class OsSitter(object):
                     
                     
         # Test mail - Si tout est ok
-        mail_params=self.config.parameters.mail
-        server_params=self.config.parameters
-        # Creation of the object to send mails
-        mails=Mails()
-        message =f"""\Supervision activée sur de {server_params.server_name}.
+        subject=f"Initialisation de la surveillance de '{server_params.server_name}'"
+        message =f"""Supervision activée sur {server_params.server_name}.
         """
-        print(mail_params.sender)
-        #mails.Send(f"Etat du serveur '{server_params.server_name}'" , message, mail_params.sender, mail_params.get_toList(), mail_params.get_ccList(), mail_params.get_cciList());
-        mails.Send(mail_params.sender,f"Initialisation de la surveillance de '{server_params.server_name}'" , message, mail_params);
+                
+        mails.Send(mail_params.sender, subject , message, mail_params);
             
-    """
-    Begining
+            
+    """ Begining
     """
     def main(self):
-        # Assign
-        server_params=self.config.parameters
-        mail_params=self.config.parameters.mail
-        # debugMode
-        
         print("Démarrage : {}".format(datetime.now().strftime(self.timeFormat)))
-
 
         # Initialisation
         obj=datetime.now()
-        print(type(obj))
-        print(obj.date)
-
 
         """
         import inspect
@@ -284,47 +336,23 @@ class OsSitter(object):
             if not attr[0].startswith("__"):
                 print(attr)
         """
+            #result = map (lambda x:x['address'], mail_params.to)
 
-        #config.InitAlerts(datetime.now())
+        while(not self.__stopped):
 
-
-        while(not self.__stopped):#not self.__stopped):
-
-            
+            # Force to reload a new configuration file
             if os.path.isfile("./new-config.json"):
-                print("Nouvelle configuration détectée: Chargement")
-                try:
-                    new_config= Config.Factory()
-                    self.__config=new_config
-                    os.remove("./config.json")
-                    os.rename("./new-config.json", "./config.json")
-                    self.__debugMode = server_params.debug
-                    self.__config.InitAlerts(datetime.now())
-
-                    
-                except Exception as exc:
-                    print("Erreur de chargement du nouveau fichier, chargement refusé")
-                    print(exc)
-                    
-
-             
-            #print(type(config))
-            #print(type(config.alertes))
-
+                InitConfig("./new-config.json",reload=True)
+                #self.__config.InitAlerts(datetime.now())
 
                 
             # Stop All
             if self.config.parameters.stop==True:
+                self.__stopped=True
                 break;
 
-
-            #result = map (lambda x:x['address'], mail_params.to)
-            #print(list(result))
-            #result = mail_params.get_toList()
-            #result = mail_params.get_ccList()
-            #result = mail_params.get_cciList()
             
-            
+            # Alerts
             for alert in self.config.alerts:
                 # Debug Mode -> show alert informations
                 if self.debugMode:
@@ -337,7 +365,8 @@ class OsSitter(object):
                 if alert.typeA =="service" :
                     old_state=alert.state
                     # Check alert
-                    if alert.next_execution == None or  datetime.now() > alert.next_execution :            
+                    #alert.next_execution == None or 
+                    if  datetime.now() >= alert.next_execution :            
                         print(f"Traitement de l'alerte {alert.nom} de type {alert.typeA}")
                    
                                     
