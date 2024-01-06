@@ -2,9 +2,9 @@
 # coding: utf-8
 
 """
-Auteur: Alexandre Codoul
-Version: alpha 2.1
-Requiert Python 3.6
+Author: Alexandre Codoul
+Version: alpha 3
+Required Python 3.6
 Todo:
 - Horodatage -> module à part
 - Détection sortie clavier

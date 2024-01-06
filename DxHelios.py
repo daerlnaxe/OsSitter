@@ -1,3 +1,11 @@
+#! /usr/bin/env python3
+# coding: utf-8
+"""
+Author: Alexandre Codoul
+Version: alpha 3
+Required Python 3.6
+"""
+
 def get_sender(who):    
     if type(who) == str:
         return who
