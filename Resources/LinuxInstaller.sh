@@ -66,8 +66,9 @@ if [[ -z "$installFolder" ]]; then
 	exit 1
 fi
 installFolder="$installFolder/OsSitter"
-echo "You want to install in '$installFolder'"
-fullIF=$(realpath $installFolder))
+echo "You want install to '$installFolder'"
+fullIF=$(realpath $installFolder)
+
 
 
 
@@ -96,7 +97,6 @@ read -p "Press a key to continue"
 
 
 
-
 # Move files
 echo "Move files to installation folder $installFolder"
 mkdir -p $fullIF
@@ -114,21 +114,18 @@ cp $languageFile $fullIF/currentlang.json
 # Stop if error
 set -e
 echo "Modify rights on $installFolder recursively"
-chmod 744 $installFolder
-chmod 644 $installFolder/*
+chmod 744 $fullIF
+chmod 644 $fullIF/*
 echo "Giving execution to $installFolder/OsSitter.py"
-chmod 744 $installFolder/OsSitter.py
+chmod 744 $fullIF/OsSitter.py
 
 echo "Modify ossitter.service"
 #pyth_file=$(realpath $installFolder/OsSitter.py)
 #echo $pyth_file
 # PrincipeExecStart=/bin/bash -c 'cd /home/ubuntu/project/ && python app.py'
-sed -i "s,{InstallFolder},$installFolder,gm" "./tmp/Resources/ossitter.service"
-
-
+sed -i "s,{InstallFolder},$fullIF,gm" "./tmp/Resources/ossitter.service"
 
 echo "Changing owner to root"
-
 
 sudo chown root: $fullIF
 
@@ -140,4 +137,5 @@ sudo chmod 644 /lib/systemd/system/ossitter.service
 sudo systemctl daemon-reload
 sudo systemctl enable ossitter
 sudo systemctl start ossitter
+sudo systemctl status ossitter
 #sudo chmod 644 /lib/systemd/system/ossitter.service
