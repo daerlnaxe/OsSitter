@@ -11,10 +11,8 @@ Restart=on-failure
 # >>> To Modify <<<
 User=alex
 # Don't touch !			
-ExecStart=/bin/bash -c 'cd {InstallFolder} && ./OsSitter.py'
-# Logs
-StandardOutput=append:{InstallFolder}/ossitter-std.log
-StandardError=append:{InstallFolder}/ossitter-err.log
+ExecStart=/bin/bash -c 'cd {InstallFolder} && ./OsSitter.py > ossitter.log'
+
 
 [Install]
 WantedBy=multi-user.target
