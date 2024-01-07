@@ -3,17 +3,8 @@
 
 """
 Author: Alexandre Codoul
-Version: alpha 4
+Version: See above
 Required Python 3.6
-Todo:
-- Horodatage -> module à part
-- Détection sortie clavier
-- Détection reboot machine
-- Envoyer mail au chargement
-Features:
-- Loop by /60s
-- Load new config file if there is a file named 'new-config.json'
-- Tests on init
 
 Linux :
 - Background launch : nohup ./OsSitter.py &
@@ -41,6 +32,16 @@ import signal
 
 
 class OsSitter(object):
+    __version="a4.1"
+
+    # Used to quit loop
+    __stopped=False
+    
+    # Directory path
+    __directory=None    
+
+    # idk
+    _instance = None       # Attribut statique de classe
     @property
     def timeFormat(self):
         return "%Y-%m-%d %H:%M:%S"
@@ -96,14 +97,6 @@ class OsSitter(object):
         self.__stopped=True
      
 
-    # Used to quit loop
-    __stopped=False
-    
-    # Directory path
-    __directory=None    
-
-    # idk
-    _instance = None       # Attribut statique de classe
  
     def __new__(cls): # __new__ classmethod implicite: la classe 1e paramètre
         #méthode de construction standard
@@ -123,7 +116,7 @@ class OsSitter(object):
         print('#' + ' '*50 + '#')
         
         #OsSitter: 8 chars
-        print('#' +' '*21 +  "OsSitter" +' '*21+ '#')
+        print('#' +' '*17 +  f"OsSitter - v{self.__version}" +' '*17+ '#')
         print('#' + ' '*50 + '#')
         print('#'*52)
         
@@ -145,7 +138,8 @@ class OsSitter(object):
 
         # Load and init configuration
         self.InitConfig()
-
+        if self.mail_params.mute_mode:
+            DxHelios.Warning(self, lang.get('warning_mutemode'))
 
         
         # 
@@ -160,9 +154,9 @@ class OsSitter(object):
             with open(fileName, "r") as read_file:
                 lang = json.load(read_file)
                 
-            DxHelios.Say(self, f"{lang.get('load_lang')}", ind_mess= 1)
+            DxHelios.Say(self, f"{lang.get('load_lang')}: {lang.get('language')} -  v{lang.get('version')}", ind_mess= 1)
         else:
-            DxHelios.Say(self, f"{lang.get('load_newlang')}", ind_mess= 1)
+            DxHelios.Say(self, f"{lang.get('load_newlang')}: {lang.get('language')} -  v{lang.get('version')}", ind_mess= 1)
             try:
                 with open(fileName, "r") as read_file:
                     lang = json.load(read_file)                   
@@ -178,14 +172,20 @@ class OsSitter(object):
     """ Initialize Configuration
     """
     def InitConfig(self, fileName="./config.json", reload=False):
+        filePath=os.path.join( self.__directory, fileName  )
+        
         # Chargement de la configuration
         if not reload:
+            if not os.path.isfile(filePath):
+                Config.CF_Builder(filePath)
+                
             DxHelios.Say(self, f"{lang.get('load_cfg')}", ind_mess= 1)
-            self.__config= Config.Factory(os.path.join( self.__directory, fileName  ))
+            self.__config= Config.Factory(filePath)            
         else:  
+            
             DxHelios.Say(self, f"{lang.get('load_newcfg')}", ind_mess= 1)
             try:
-                self.__config= Config.Factory(os.path.join( self.__directory, fileName  ))
+                self.__config= Config.Factory(filePath)
                 
                 # --
                 os.remove("./config.json")
@@ -209,12 +209,6 @@ class OsSitter(object):
         # Set the next time alert
         self.__config.InitAlerts(datetime.now())
         
-        if self.debugMode:            
-            DxHelios.ShowParams(self, lang.get('repr_conf'), self, self.config, True)
-            #print("\tReprésentation de la configuration: ",self.config.__repr__()) # fonctionnel
-            DxHelios.ShowParams(self, lang.get('repr_params'), self, self.srv_params, True)
-            DxHelios.ShowParams(self, lang.get('repr_alerts'), self, self.alerts, True)
-            DxHelios.ShowParams(self, lang.get('repr_mails'), self, self.mail_params, True)
 
         return True
 
@@ -327,7 +321,16 @@ class OsSitter(object):
         DxHelios.Title(self, "Tests")        
         DxHelios.Say(self, lang.get('lnch_tests'))
         
-        # 
+        # config
+        if self.debugMode:            
+            DxHelios.ShowParams(self, lang.get('repr_conf'), self, self.config, True)
+            #print("\tReprésentation de la configuration: ",self.config.__repr__()) # fonctionnel
+            DxHelios.ShowParams(self, lang.get('repr_params'), self, self.srv_params, True)
+            DxHelios.ShowParams(self, lang.get('repr_alerts'), self, self.alerts, True)
+            DxHelios.ShowParams(self, lang.get('repr_mails'), self, self.mail_params, True)
+
+        
+        # mails
         if self.debugMode:
             # Tests for mails content
             old_mute_mode= self.mail_params.mute_mode

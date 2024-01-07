@@ -3,7 +3,8 @@
 
 # Make me executable by using 'sudo chmod +x LinuxInstaller.sh'
 # Then run me by using './LinuxInstaller.sh'
-
+echo "### Welcome to OsSitter installer"
+echo "Note: The configuration file will not be overwritten"
 read -p "Enter the installation folder: " installFolder
 installFolder="$installFolder/OsSitter"
 echo "You want to install in '$installFolder'"
@@ -61,7 +62,8 @@ chmod 744 $installFolder/OsSitter.py
 echo "Modify ossitter.service"
 pyth_file=$(realpath $installFolder/OsSitter.py)
 echo $pyth_file
-sed -i "s,{InstallFolder},$pyth_file,g" "./tmp/Resources/ossitter.service"
+# PrincipeExecStart=/bin/bash -c 'cd /home/ubuntu/project/ && python app.py'
+sed -i "s,{InstallFolder},$installFolder,gm" "./tmp/Resources/ossitter.service"
 
 
 
@@ -73,5 +75,7 @@ sudo chown root: $installFolder
 sudo cp ./tmp/Resources/ossitter.service /lib/systemd/system/ossitter.service
 sudo chmod 644 /lib/systemd/system/ossitter.service
 
+sudo systemctl daemon-reload
+sudo systemctl enable ossitter
 sudo systemctl start ossitter
 #sudo chmod 644 /lib/systemd/system/ossitter.service

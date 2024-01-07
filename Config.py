@@ -1,7 +1,6 @@
 """
 Auteur : Alexandre CODOUL
-Version: Alpha 4
-TODO:
+Version: Alpha 4.1
 """
 
 import json
@@ -71,7 +70,7 @@ class Config:
         return self.__Alerts
         
         
-    def __init__(self, Parameters: Parameters_Obj, Alertes: List[Alert]):        
+    def __init__(self, Version,Parameters: Parameters_Obj, Alertes: List[Alert]):        
         
         #        
         self.__Parameters= Parameters_Obj.dict_toParams(Parameters)
@@ -125,8 +124,9 @@ class Config:
     # create Factory static method
     @staticmethod
     def Factory(filePath):
-        DxHelios.Say("Config", f"Chargement du fichier de configuration: {filePath}",1)
-            
+        DxHelios.Say("Config", f"Chargement du fichier de configuration: {filePath}",1,1)
+        
+        
         with open(filePath, "r") as f:
             json_data = f.read()
 
@@ -135,5 +135,48 @@ class Config:
         return Config(**json.loads(json_data))
 
 
+    """ (Re)Build config file
+    """
+    @staticmethod
+    def CF_Builder(filePath):
+        DxHelios.Say("Config", f"Création du fichier de configuration: {filePath}",1,1)
+        
+        json_content="""{
+	"Version":"Alpha4",		
+	"Parameters":
+	{	
+		"ServerName": "",
+		"Debug":true,
 
- 
+		"Stop": false,
+		"Sleeper": 1, 		
+		"Mail":
+		{
+			"mutemode": true,
+			"sender": "",
+			"smtp":{
+				"smtpstring": "",	
+				"port": 587,
+			    "auth": true,
+				"login": "",
+				"app-password": ""
+			},
+			"to":[
+			{
+				"name":"me",
+				"address": ""
+				
+			}
+			],
+			"cc":[],
+			"cci":[]			
+		}
+	},
+	
+	"Alertes": []
+}"""
+        
+        
+        with open(filePath, "w") as f: 
+            f.write(json_content)
+            

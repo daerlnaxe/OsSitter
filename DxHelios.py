@@ -2,7 +2,7 @@
 # coding: utf-8
 """
 Author: Alexandre Codoul
-Version: alpha 4
+Version: alpha 4.1
 Required Python 3.6
 """
 import traceback
@@ -25,6 +25,13 @@ def Debug (who, message: str, ind_class=0, ind_mess=0):
     print("{}{} | {}--Debug-- {}".format(get_sender(who), "\t"*ind_class, "\t"*ind_mess, message))
     #print(f"{get_sender(who)}"+"\t"*ind_class+" | " + "\t"*ind_mess + "--Debug-- " + message)
 
+
+def Warning (who, message):
+    mult=14
+    Jump()
+    print("{} {} warning !!! {} {}".format('>'*mult,get_sender(who), message, '<'*mult))
+    Jump()
+    
 def Error (who,message,exc):
     print(">"*20+ get_sender(who))
     print(message)

@@ -3,7 +3,7 @@ Auteur : Alexandre CODOUL
 Version: Alpha 4
 TODO:
 - Add argument to replace $varService
-- Ajouter une compatibilité Windows
+- Add Windows Compatibility
 """
 import subprocess
 import sys

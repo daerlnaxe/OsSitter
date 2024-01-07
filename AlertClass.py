@@ -1,7 +1,6 @@
 """
 Auteur : Alexandre CODOUL
 Version: Alpha 4
-TODO:
 """
 class Alert:
     # Alert Name

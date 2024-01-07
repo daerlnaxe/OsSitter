@@ -1,5 +1,6 @@
 {
-	"lang_version":"Alpha 4",
+	"version":"1.0.0",
+	"language":"Français",
 		
 	"failed": "failed",	
 	"mute_mode": "mute mode",	
@@ -56,7 +57,7 @@
 	"service_test":"Test du nom pour le service",
 	
 	"warning_nowtch":"Le serveur n'est plus surveillé ou a été redémarré.",
-	
+		"warning_mutemode":"Le serveur ne peut pas envoyer de mails",
 	
 	
 	
