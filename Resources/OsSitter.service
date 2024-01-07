@@ -1,0 +1,13 @@
+# Copy me in the systemd folder, like /lib/systemd/system/
+[Unit]
+Description="OsSitter help you to monitor your PC and Services"
+# After= what you want
+
+[Service]
+Type=idle			# Run when all active service are launched
+Restart=on-failure	# Must finish with a 0 code
+User=alex			# <-- Modify
+ExecStart=/usr/bin/python {InstallFolder}
+
+[Install]
+WantedBy=multi-user.target
