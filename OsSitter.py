@@ -477,6 +477,7 @@ Starting point
 if __name__ == '__main__':    
     sup = OsSitter()
     if not sup.test():
+        DxHelios.Say("__main__", "Tests echoués")
         sys.exit()
     
     # Sys.exit to signal why
