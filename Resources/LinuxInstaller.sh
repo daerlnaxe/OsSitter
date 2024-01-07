@@ -7,15 +7,16 @@ echo "### Welcome to OsSitter installer for version 1.1"
 echo "Compatible OsSitter v4/4.1"
 echo "Note: The configuration file will not be overwritten"
 # stop if error
-set -e
 
-while getopts ":f:l:" opt; do
+while getopts ":f:l:u:" opt; do
   # Assign
   case $opt in
     f) tar_file="$OPTARG"
     ;;
     l) lang_file="$OPTARG"
     ;;
+	u) ch_user="$OPTARG"
+	;;
     \?) echo "Invalid option -$OPTARG" >&2
     exit 1
     ;;
@@ -32,7 +33,9 @@ if [ -z "$tar_file" ] ; then
         exit 1
 fi
 
-# Check tar file
+
+# Test tar file
+set -e
 echo "Test '$tar_file'"
 if [[ ! -f $tar_file ]];then
 	echo "This file doesn't exists: $tar_file"
@@ -45,21 +48,32 @@ if [[ $? != 0 ]]
 then
 	echo "This tar file is invalid: $tar_file"
 	exit 11
+else 
+	echo "Test tar file: success"
 fi
 
+set +e
 
-# Decompress
-if [[ ! -d ./tmp ]]
+
+
+# Service account
+read -p "Enter a service account name: " ch_user
+if [[ -z "$ch_user" ]]; then
+    echo "Exit : no user selected"
+	exit 1
+fi
+echo "You want run it as '$ch_user'"
+id $ch_user > /dev/null >&1
+res=$?
+set -e
+
+if [[ $res != 0 ]]
 then
-	mkdir ./tmp
+sudo useradd --system --no-create-home $ch_user
 fi
 
-echo "Decompressing ..."
-# --Strip-components=1 remove root
-tar -xzf $tar_file -C tmp --strip-components=1
 
-
-
+# Installation folder
 read -p "Enter the installation folder: " installFolder
 if [[ -z "$installFolder" ]]; then
     echo "Exit : no folder selected"
@@ -94,6 +108,18 @@ read -p "Press a key to continue"
 
 
 
+# Decompress
+set -e
+if [[ ! -d ./tmp ]]
+then
+	mkdir ./tmp
+fi
+
+echo "Decompressing ..."
+# --Strip-components=1 remove root
+tar -xzf $tar_file -C tmp --strip-components=1
+
+
 # Move files
 echo "Move files to installation folder $installFolder"
 mkdir -p $installFolder
@@ -111,7 +137,7 @@ done
 cp $languageFile $fullIF/currentlang.json
 
 # Stop if error
-set -e
+
 echo "Modify rights on $installFolder recursively"
 chmod 744 $fullIF
 chmod 644 $fullIF/*
@@ -123,10 +149,11 @@ echo "Modify ossitter.service"
 #echo $pyth_file
 # PrincipeExecStart=/bin/bash -c 'cd /home/ubuntu/project/ && python app.py'
 sed -i "s,{InstallFolder},$fullIF,gm" "./tmp/Resources/ossitter.service"
+sed -i "s,{ch_user},$ch_user,gm" "./tmp/Resources/ossitter.service"
 
 echo "Changing owner to root"
 
-sudo chown root: $fullIF
+sudo chown -R $ch_user: $fullIF
 
 
 # install as a service

@@ -8,9 +8,9 @@ Description="OsSitter help you to monitor your PC and Services"
 Type=idle			
 # Must finish with a 0 code
 Restart=on-failure
-# >>> To Modify <<<
-User=alex
-# Don't touch !			
+
+# Don't touch !
+User={ch_user}		
 ExecStart=/bin/bash -c 'cd {InstallFolder} && ./OsSitter.py > ossitter.log'
 
 
