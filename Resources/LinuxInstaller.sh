@@ -67,9 +67,6 @@ if [[ -z "$installFolder" ]]; then
 fi
 installFolder="$installFolder/OsSitter"
 echo "You want install to '$installFolder'"
-fullIF=$(realpath $installFolder)
-
-
 
 
 echo "language files"
@@ -99,7 +96,9 @@ read -p "Press a key to continue"
 
 # Move files
 echo "Move files to installation folder $installFolder"
-mkdir -p $fullIF
+mkdir -p $installFolder
+fullIF=$(realpath $installFolder)
+
 cd $fullIF || exit 1
 cd - > /dev/null
 
@@ -136,6 +135,8 @@ sudo chmod 644 /lib/systemd/system/ossitter.service
 
 sudo systemctl daemon-reload
 sudo systemctl enable ossitter
-sudo systemctl start ossitter
+echo "daemon installed and enabled, but not started."
 sudo systemctl status ossitter
 #sudo chmod 644 /lib/systemd/system/ossitter.service
+
+echo "Finished... If this is a fresh installation, you need to configure"
