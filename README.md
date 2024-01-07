@@ -1,13 +1,25 @@
 [TOC]
 
 # OsSitter
+## New
+Happy to say i successful made Linux installer and uninstaller...
+It's now easy to implement. 
+It gives possibilities:
+- to create a service account, and install in its home folder.
+- Give rights
+- Install it as a systemd daemon
+- Doesn't launch immediatly but enable, to let you configure.
+- Almost a generic installer
+
+!!! Warning I don't think there is people interested for the while but wait next release, i need to verify again and again there is no error. I made a lot of tests, but just in case...
+
 ## About
  Watch behavior of Operating system
 
 NO GUI ! It's for Core Servers.
 
 It uses a simple json configuration file to add the things you want to watch
-It uses a simple json language file to translate as you wish
+It uses a simple json language file to translate as you wish.
 
 
 ## Last version
@@ -22,7 +34,9 @@ It uses a simple json language file to translate as you wish
     - [ ] free space
     - [ ] Custom command
     - [ ] Securities
-- Move mails part
+- [ ] Move mails part
+- [ ] See possibilities to send cli message to all users connected on linux.
+- [ ] I still standing, yeah, yeah, yeah (daily mail)
 
 <br>
 
