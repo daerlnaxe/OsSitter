@@ -163,14 +163,14 @@ chown -R $ch_user: $fullIF
 
 
 # install as a service
-cp ./tmp/Resources/ossitter.service /lib/systemd/system/ossitter.service
-chmod 644 /lib/systemd/system/ossitter.service
+cp ./tmp/Resources/ossitter.service /etc/systemd/system/ossitter.service
+chmod 644 /etc/systemd/system/ossitter.service
 
 systemctl daemon-reload
 systemctl enable ossitter
 echo "daemon installed and enabled, but not started."
 systemctl status ossitter
-#chmod 644 /lib/systemd/system/ossitter.service
+
 
 echo "Finished... If this is a fresh installation, you need to configure"
 exit
