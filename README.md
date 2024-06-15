@@ -1,4 +1,4 @@
-[TOC]
+ve[TOC]
 
 # OsSitter
 ## New
@@ -23,13 +23,13 @@ It uses a simple json language file to translate as you wish.
 
 
 ## Last version
-[Alpha 4.1](#alpha-41)
+[Alpha 5](#alpha-5)
 
 
 # Todo
 - Add new features like
     - [ ] uptime
-    - [ ] free mem
+    - [x] free mem
     - [ ] inodes
     - [ ] free space
     - [ ] Custom command
@@ -49,6 +49,8 @@ It uses a simple json language file to translate as you wish.
         - Stopped
         - Restarted
     - Time between mails sent
+- Functions:
+    - Memory test: give % used
 - Mails
     - Send mail to multiple people
     - Send mails to several CC
@@ -112,6 +114,11 @@ Version x.y.z:
 <br>
 
 # Changelog
+## Alpha 5
+15/06/2024
+- New feature: "functions"
+    - First, memory test with alerting
+
 ## Alpha 4.1
 07/01/2024
 - Installer.sh for Linux installation as a service
@@ -134,10 +141,5 @@ Version x.y.z:
 
 # Sums
 ```
-59865762076c311eedbbc2d3f06139061491e13d5771d32fb104c9b6f0c8a480 *AlertClass.py
-5eb1fba5df1c4ded192dabaab0fa71b0f95c7186ae1f969c371b9df309e17eae *Check_Service.py
-fe96c8584e547d839d6429f79f980dacbc416178b005c67774bc2af027032fd9 *Config.py
-97ea65eb92e2409e0beec95cd04812feae71ff196c8def69e969197ba27fdbed *DxHelios.py
-bed69206fccc7b84f3e21878cef34aa77c4e7aff008bac672a9c454dd97ad37a *OsSitter.py
-07c7d4f0962c775c6069dde071c5d025d708db4ab9bb111afc8ddd228bb4448f *SendMail.py
+
 ```

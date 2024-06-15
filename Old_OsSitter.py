@@ -21,7 +21,6 @@ import DxHelios
 from AlertClass import Alert
 from Config import Config
 from Check_Service import Service
-from Check_Function import Function
 from SendMail import Mails
 from datetime import datetime, timedelta
 # Used to detect when stopped
@@ -70,17 +69,10 @@ class OsSitter(object):
     @property
     def alerts(self):
         return self.__alerts
-
-    # A Service object, used to managed services to watch     
+        
     @property
     def srvc(self):
         return self.__srvc
-
-    # A fction object, used to managed functions
-    @property
-    def fction(self):
-        return self.__fction
-    
         
     #debugMode=None
     
@@ -152,8 +144,6 @@ class OsSitter(object):
         
         # 
         self.__srvc=Service(lang, self.osDetected)
-        self.__fction=Function(lang, self.osDetected)
-        
 
     """ Initialize Language
     """
@@ -269,7 +259,7 @@ class OsSitter(object):
         
         mails.Send(self.mail_params.sender, subject , message, self.mail_params);
 
-    # Alerte générique utilisée par les autres fonctions
+    #
     def alert_mail(self, subject, ori_message):    
         # Creation of the object to send mails
         mails=Mails()
@@ -284,27 +274,8 @@ class OsSitter(object):
         mails.Send(self.mail_params.sender, subject , message, self.mail_params);
     
     
-    # Function
-    def mail_function(self, alert: Alert, message, title):
-        print (alert)
-        print (type(alert))
-        
-        # Keep a respectuous mail flow
-        if alert.next_alarm == None or datetime.now() > alert.next_alarm:
-            subject=f"{lang.get('function')} '{alert.nom}' - {title} "
-            message=f"Function '{alert.nom}': {message}"
-            self.alert_mail( subject, message)
-
-            # Assign time for the next alert
-            alert.next_alarm = datetime.now() + timedelta(minutes=alert.delay_alarm)
-            DxHelios.Say(self, f"Prochaine alarme programmée: {alert.next_alarm}",0,1)
-        else:
-            DxHelios.Say(self, f"{alert.nom}: pas d'envoi de mail avant: {alert.next_alarm}",0,1)
-        
-    
-    # Service-
-    ## Send a mail "stopped service"
-    def mail_stoppedservice(self, alert: Alert):
+    # Send a mail "stopped service"
+    def manage_stoppedservice(self, alert: Alert):
         # Keep a respectuous mail flow
         if alert.next_alarm == None or datetime.now() > alert.next_alarm:
             subject=f"{lang.get('service')} '{alert.nom}' {lang.get('mail_isstopped')} "
@@ -318,8 +289,8 @@ class OsSitter(object):
             DxHelios.Say(self, f"{alert.nom}: pas d'envoi de mail avant: {alert.next_alarm}",0,1)
 
 
-    ## Send a mail "restarted service"
-    def mail_restartedservice(self, alert: Alert):
+    # Send a mail "restarted service"
+    def manage_restartedservice(self, alert: Alert):
         subject=f"{lang.get('service')} '{alert.nom}' {lang.get('mail_isrestarted')} "
         
         message =f"{lang.get('mail_wservice')} '{alert.nom}' {lang.get('mail_isrestarted')} !"
@@ -331,7 +302,6 @@ class OsSitter(object):
     Mails - End Part
     """
 
-# ------------------------------------------------------------J
     
     """ Signal when program is stopped
     - doesn't work for shutdown PC
@@ -375,9 +345,9 @@ class OsSitter(object):
                 self.normal_mail("sigterm")
 
                 # alert
-                pseudoalert=Alert("pseudo", "pseudo", "pseudo", 0, 0)
-                self.mail_stoppedservice(pseudoalert)
-                self.mail_restartedservice(pseudoalert)
+                pseudoalert=Alert("pseudo", "pseudo",0,0)
+                self.manage_stoppedservice(pseudoalert)
+                self.manage_restartedservice(pseudoalert)
 
                 DxHelios.Debug(self, lang.get("mail_testsok"))
             except Exception as exc:
@@ -386,20 +356,15 @@ class OsSitter(object):
             
             self.mail_params.mute_mode=old_mute_mode
         
-        # Check alerts 
+        # Check services names
         for alert in self.config.alerts:
             if alert.typeA =="service" :
-                # Verify if service exists
                 alert.state=self.srvc.checkname(alert.nom)
-
-                
                     
         # Test mail - if everything is ok
         self.normal_mail("just_a_test")
         
         return True
- 
- 
  
  
     """ Begining
@@ -454,89 +419,46 @@ class OsSitter(object):
                     DxHelios.Debug(self,f"{lang.get('next_exec')} {alert.nom}: {alert.next_execution}")
 
                 # Traitement de l'alerte
-                ## Common / Begin
-                if (alert.typeA =="service" or alert.typeA == "function"):
+                if alert.typeA =="service" :
                     old_state=alert.state
+                    # Check alert
+                    #alert.next_execution == None or 
                     if  datetime.now() >= alert.next_execution :            
                         DxHelios.Say(self, f"{lang.get('alert_handl')} {alert.nom} {lang.get('typeof')}: {alert.typeA}",0,1)
+                   
+                                    
+                        alert.state=self.srvc.checkservice(alert.nom)
+                        
+                        self.config.set_nextexecution(alert)
+                        DxHelios.Say(self, f"{lang.get('next_execset')} {alert.next_execution}",0,1)
+
+                        # Gestion du check    
+                        if self.debugMode:
+                            DxHelios.Debug(self, f"{lang.get('states')}, check: {alert.state} | old_state: {old_state}")
+                           
+
                     # No check                    
                     else:
                         DxHelios.Say(self, f"{lang.get('service_nextchk')} {alert.nom}: {alert.next_execution}",0,1)
-                
-                
-                
-                ## Type of service
-                if  alert.typeA =="service":
-                    # Check alert
-                    #alert.next_execution == None or 
-                                    
-                    alert.state=self.srvc.checkservice(alert.nom)
-                        
-                                      
+
+                                       
                     
                     if old_state==None:
                         old_state=alert.state
 
                     # Alerting
-                    ## Etat ok
                     if old_state and alert.state:
                         DxHelios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_ok')}",0,1)
-                    ## Service revenu
                     elif old_state is False and alert.state:                    
                         DxHelios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_rst')}",0,1)
-                        self.mail_restartedservice( alert)                
-                    ## Service stoppé
+                        self.manage_restartedservice( alert)                
                     elif alert.state is False:  
                         DxHelios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_stpd')}",0,1)
-                        self.mail_stoppedservice( alert)
-                    ## Autre
+                        self.manage_stoppedservice( alert)
                     else:
                         raise ValueError(lang.get('err_value'))                
-
-
-                # Type of function                                 
-                elif (alert.typeA == "function" ):
-                    res=self.fction.getresult(alert)
-                   
-                    alert.state=res[0]
-                    
-                    if old_state==None:
-                        old_state=alert.state
-            
-            
-                    # Alerting
-                    ## Etat ok
-                    if old_state and alert.state:
-                        DxHelios.Say(self,f"Mémoire inférieure à {alert.trigger}: {res[1]}",0,1)
-                    ## Etat de la fonction, restauré
-                    elif old_state is False and alert.state:
-                        msg=f"Mémoire revenue à {alert.trigger} : {res[1]}"
-                        DxHelios.Say(self,msg,0,1)
-                        self.mail_function( alert, msg, "mémoire ok")                
-                    ## Etat de la fonction, critique
-                    elif alert.state is False:  
-                        msg=f"Mémoire supérieure à {alert.trigger}: {res[1]}"
-                        DxHelios.Say(self, msg,0,1)
-                        self.mail_function( alert, msg, "alerte mémoire")
-                    ## Autre
-                    else:
-                        raise ValueError(lang.get('err_value'))       
-
-
-
-
-                ## Common / Next Execution
-                if (alert.typeA =="service" or alert.typeA == "function"):
-                    self.config.set_nextexecution(alert)
-                    DxHelios.Say(self, f"{lang.get('next_execset')} {alert.next_execution}",0,1)
-
-
-                # Gestion du check    
-                if self.debugMode:
-                    DxHelios.Debug(self, f"{lang.get('states')}, check: {alert.state} | old_state: {old_state}")
-
-
-
+                                    
+                        
                     
             # Time to Sleep (see 
             DxHelios.Say(self,f"{lang.get('sleep_param')} {self.config.parameters.sleeper * 60 }s\n\n")

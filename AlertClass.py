@@ -12,6 +12,11 @@ class Alert:
     @property
     def typeA(self):
         return self.__typeA
+
+    # Alert Trigger
+    @property
+    def trigger(self):
+        return self.__trigger
     
     # Alert Timer
     @property
@@ -35,16 +40,23 @@ class Alert:
     
     #Next alarm
     next_alarm=None
-    
-    def __init__(self,nom: str,typeA: str, timer: int, delay_alarm: int):                
+
+    # Builder
+    def __init__(self,nom: str,typeA: str, trigger: str, timer: int, delay_alarm: int):                
         self.__nom = nom
         self.__typeA=typeA
+        self.__trigger=trigger
         self.__timer=timer
         self.__delay_alarm=delay_alarm
 
+
     @classmethod
     def dict_toAlert(self, adict:dict):
-        return Alert(adict["nom"], adict["typeA"], adict["timer"], adict["delay_alarm"])
+        typeA= adict["typeA"] 
+        if( typeA =="service"):
+            return Alert(adict["nom"], adict["typeA"], "",adict["timer"], adict["delay_alarm"])
+        elif (typeA=="function"):
+            return Alert(adict["nom"], adict["typeA"], adict["trigger"],adict["timer"], adict["delay_alarm"])
         
    
     """
