@@ -86,12 +86,15 @@ Version x.y.z:
 
 ### Service configuration
 ```JSon
-{
-    "nom": "kea-dhcp4",
-    "typeA": "service",
-    "timer":2,
+...
+"Alertes" :[
+    {
+        "nom": "kea-dhcp4",
+        "typeA": "service",
+        "timer":2,
 	"delay_alarm":5
-}
+    }
+....
 ```
 
 ### SMTP configuration
