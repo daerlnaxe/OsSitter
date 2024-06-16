@@ -1,4 +1,5 @@
-[_TOC_]
+[TOC]
+
 # Config File
 ## Config File Lambda
 > [] : optionnal
