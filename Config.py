@@ -7,7 +7,7 @@ import json
 import DxHelios
 from typing import List
 from AlertClass import Alert
-from SendMail import Mail_Block, Mail_Obj
+from MailSender import Mail_Block, Mail_Obj
 from datetime import datetime, timedelta
 
 
@@ -40,6 +40,7 @@ class Parameters_Obj:
         self.__stop=Stop
         self.__mail=Mail
         self.__server_name=ServerName
+
     
     @classmethod
     def dict_toParams(self, adict:dict):

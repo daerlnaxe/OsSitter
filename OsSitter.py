@@ -22,18 +22,18 @@ from AlertClass import Alert
 from Config import Config
 from Check_Service import Service
 from Check_Function import Function
-from SendMail import Mails
+#from SendMail import Mails
 from datetime import datetime, timedelta
 # Used to detect when stopped
 import atexit 
 # User to intercept sigkill and ...
 import signal
-
+from MailCreator import MailCreator
 
 
 
 class OsSitter(object):
-    __version="a4.1"
+    __version="a5.1"
 
     # Used to quit loop
     __stopped=False
@@ -55,9 +55,6 @@ class OsSitter(object):
     def config(self):
         return self.__config
     
-    @property
-    def srv_params(self):
-        return self.__srv_params
         
     @property
     def debugMode(self):
@@ -80,8 +77,12 @@ class OsSitter(object):
     @property
     def fction(self):
         return self.__fction
-    
         
+    # Object to send mails
+    @property
+    def mailer(self):
+        return self.__mailer
+
     #debugMode=None
     
     @staticmethod
@@ -150,9 +151,10 @@ class OsSitter(object):
             DxHelios.Warning(self, lang.get('warning_mutemode'))
 
         
-        # 
+        # Initialisation des objets
         self.__srvc=Service(lang, self.osDetected)
         self.__fction=Function(lang, self.osDetected)
+
         
 
     """ Initialize Language
@@ -198,23 +200,26 @@ class OsSitter(object):
                 self.__config= Config.Factory(filePath)
                 
                 # --
-                os.remove("./config.json")
+                if (os.path.exists("./config.json")):
+                    os.remove("./config.json")
                 os.rename("./new-config.json", "./config.json")
                 #new_config= Config.Factory()
                 # self.__config=new_config
                 # self.__debugMode = server_params.debug
             except Exception as exc:
-                DxHelios.Error(self,f"{lang.get('err_cfgload')}")
+                DxHelios.Error(self,f"{lang.get('err_cfgload')}", exc)
                 print(exc)
                 return False
             
         
 
         # Assignation
-        self.__srv_params=self.config.parameters
+        #self.__srv_params=self.config.parameters
         self.__debugMode= self.config.parameters.debug        
         self.__mail_params =  self.config.parameters.mail
         self.__alerts =  self.config.alerts
+        self.__mailer=MailCreator(lang, self.config.parameters)
+        self.mailer.debugMode=self.debugMode
         
         # Set the next time alert
         self.__config.InitAlerts(datetime.now())
@@ -224,114 +229,6 @@ class OsSitter(object):
 
    
 
-    """ Mails - Part        
-    """
-    #
-    def normal_mail(self, mailtype):
-        # Creation of the object to send mails
-        mails=Mails()
-        subject=f"{self.srv_params.server_name} - "
-        message=f"{self.srv_params.server_name}:\r\n"
-        
-        # subject
-        if mailtype == "just_a_test":
-            subject+=f"Just a test..."
-        elif mailtype == "supervision_started":
-            subject+=lang.get('mail_supactivated')
-        elif mailtype=="ctrlc":
-            subject+=lang.get('alert_stopped')
-        elif mailtype=="sigterm":
-            subject+=f"SIGTERM"
-        
-        # message
-        if mailtype == "just_a_test":    
-            message+="It's just a test"    
-        elif mailtype == "supervision_started":
-            message+=f"\t{lang.get('mail_supactivated')}."
-        elif mailtype=="ctrlc":
-            message +=f"""        
-    {lang.get('alert_stopped')} ({datetime.now()}) !
-             
-    {lang.get('alert_ctrlc')}
-    """
-        elif mailtype=="sigterm":
-            message+=f"""
-    {lang.get('mail_rsignal')} SIGTERM ({datetime.now()}) !
-            
-    {lang.get('warning_nowtch')}
-    """
-           
-            
-        message+=f"\r\n\r\n{lang.get('mail_sign')} {self.__class__.__name__}."
-        
-        if self.debugMode:
-            DxHelios.DebugMail(self,subject, message)
-        
-        mails.Send(self.mail_params.sender, subject , message, self.mail_params);
-
-    # Alerte générique utilisée par les autres fonctions
-    def alert_mail(self, subject, ori_message):    
-        # Creation of the object to send mails
-        mails=Mails()
-        subject=f"{self.srv_params.server_name} - {subject}"
-        message=f"{self.srv_params.server_name}:\r\n\t{ori_message}"
-        
-        message+=f"\r\n\r\n{lang.get('mail_sign')} {self.__class__.__name__}."
-        
-        if self.debugMode:
-            DxHelios.DebugMail(self,subject, message)
-        
-        mails.Send(self.mail_params.sender, subject , message, self.mail_params);
-    
-    
-    # Function
-    def mail_function(self, alert: Alert, message, title):
-        print (alert)
-        print (type(alert))
-        
-        # Keep a respectuous mail flow
-        if alert.next_alarm == None or datetime.now() > alert.next_alarm:
-            subject=f"{lang.get('function')} '{alert.nom}' - {title} "
-            message=f"Function '{alert.nom}': {message}"
-            self.alert_mail( subject, message)
-
-            # Assign time for the next alert
-            alert.next_alarm = datetime.now() + timedelta(minutes=alert.delay_alarm)
-            DxHelios.Say(self, f"Prochaine alarme programmée: {alert.next_alarm}",0,1)
-        else:
-            DxHelios.Say(self, f"{alert.nom}: pas d'envoi de mail avant: {alert.next_alarm}",0,1)
-        
-    
-    # Service-
-    ## Send a mail "stopped service"
-    def mail_stoppedservice(self, alert: Alert):
-        # Keep a respectuous mail flow
-        if alert.next_alarm == None or datetime.now() > alert.next_alarm:
-            subject=f"{lang.get('service')} '{alert.nom}' {lang.get('mail_isstopped')} "
-            message=f"{lang.get('mail_wservice')} '{alert.nom}' {lang.get('mail_isstopped')} !"
-            self.alert_mail( subject, message)
-
-            # Assign time for the next alert
-            alert.next_alarm = datetime.now() + timedelta(minutes=alert.delay_alarm)
-            DxHelios.Say(self, f"Prochaine alarme programmée: {alert.next_alarm}",0,1)
-        else:
-            DxHelios.Say(self, f"{alert.nom}: pas d'envoi de mail avant: {alert.next_alarm}",0,1)
-
-
-    ## Send a mail "restarted service"
-    def mail_restartedservice(self, alert: Alert):
-        subject=f"{lang.get('service')} '{alert.nom}' {lang.get('mail_isrestarted')} "
-        
-        message =f"{lang.get('mail_wservice')} '{alert.nom}' {lang.get('mail_isrestarted')} !"
-        
-        self.alert_mail( subject, message)
-
-
-    """
-    Mails - End Part
-    """
-
-# ------------------------------------------------------------J
     
     """ Signal when program is stopped
     - doesn't work for shutdown PC
@@ -342,7 +239,7 @@ class OsSitter(object):
     """
     def ACiaoi(self):
         self.__stopped=True
-        self.normal_mail("ctrlc")
+        self.mailer.normal_mail("ctrlc")
      
 
     """ Self Test 
@@ -355,7 +252,7 @@ class OsSitter(object):
         if self.debugMode:            
             DxHelios.ShowParams(self, lang.get('repr_conf'), self, self.config, True)
             #print("\tReprésentation de la configuration: ",self.config.__repr__()) # fonctionnel
-            DxHelios.ShowParams(self, lang.get('repr_params'), self, self.srv_params, True)
+            DxHelios.ShowParams(self, lang.get('repr_params'), self, self.config.parameters, True)
             DxHelios.ShowParams(self, lang.get('repr_alerts'), self, self.alerts, True)
             DxHelios.ShowParams(self, lang.get('repr_mails'), self, self.mail_params, True)
 
@@ -370,14 +267,15 @@ class OsSitter(object):
                 self.mail_params.mute_mode=True
 
                 # normal
-                self.normal_mail("supervision_started")
-                self.normal_mail("ctrlc")
-                self.normal_mail("sigterm")
+                
+                self.mailer.normal_mail("supervision_started")
+                self.mailer.normal_mail("ctrlc")
+                self.mailer.normal_mail("sigterm")
 
                 # alert
                 pseudoalert=Alert("pseudo", "pseudo", "pseudo", 0, 0)
-                self.mail_stoppedservice(pseudoalert)
-                self.mail_restartedservice(pseudoalert)
+                self.mailer.mail_stoppedservice(pseudoalert)
+                self.mailer.mail_restartedservice(pseudoalert)
 
                 DxHelios.Debug(self, lang.get("mail_testsok"))
             except Exception as exc:
@@ -395,7 +293,7 @@ class OsSitter(object):
                 
                     
         # Test mail - if everything is ok
-        self.normal_mail("just_a_test")
+        self.mailer.normal_mail("just_a_test")
         
         return True
  
@@ -405,7 +303,7 @@ class OsSitter(object):
     """ Begining
     """
     def main(self):
-        self.normal_mail("supervision_started")
+        self.mailer.normal_mail("supervision_started")
 
         # Register to intercept ctrl+c
         #linux < useless if decorator used
@@ -432,12 +330,13 @@ class OsSitter(object):
             # Force to reload a new configuration file
             if os.path.isfile("./new-config.json"):
                 self.InitConfig("./new-config.json",reload=True)
-                #self.__config.InitAlerts(datetime.now())
+                self.__config.InitAlerts(datetime.now())
 
             # Force to reload a new language file
             if os.path.isfile("./new-lang.json"):
                 self.InitLanguage("./new-lang.json",reload=True)
-                #self.__config.InitAlerts(datetime.now())
+
+
             
 
             
@@ -455,8 +354,10 @@ class OsSitter(object):
 
                 # Traitement de l'alerte
                 ## Common / Begin
+
                 if (alert.typeA =="service" or alert.typeA == "function"):
                     old_state=alert.state
+                    print(alert.next_execution)
                     if  datetime.now() >= alert.next_execution :            
                         DxHelios.Say(self, f"{lang.get('alert_handl')} {alert.nom} {lang.get('typeof')}: {alert.typeA}",0,1)
                     # No check                    
@@ -484,11 +385,11 @@ class OsSitter(object):
                     ## Service revenu
                     elif old_state is False and alert.state:                    
                         DxHelios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_rst')}",0,1)
-                        self.mail_restartedservice( alert)                
+                        self.mailer.mail_restartedservice( alert)                
                     ## Service stoppé
                     elif alert.state is False:  
                         DxHelios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_stpd')}",0,1)
-                        self.mail_stoppedservice( alert)
+                        self.mailer.mail_stoppedservice( alert)
                     ## Autre
                     else:
                         raise ValueError(lang.get('err_value'))                
@@ -512,12 +413,12 @@ class OsSitter(object):
                     elif old_state is False and alert.state:
                         msg=f"Mémoire revenue à {alert.trigger} : {res[1]}"
                         DxHelios.Say(self,msg,0,1)
-                        self.mail_function( alert, msg, "mémoire ok")                
+                        self.mailer.mail_function( alert, msg, "mémoire ok")                
                     ## Etat de la fonction, critique
                     elif alert.state is False:  
                         msg=f"Mémoire supérieure à {alert.trigger}: {res[1]}"
                         DxHelios.Say(self, msg,0,1)
-                        self.mail_function( alert, msg, "alerte mémoire")
+                        self.mailer.mail_function( alert, msg, "alerte mémoire")
                     ## Autre
                     else:
                         raise ValueError(lang.get('err_value'))       
