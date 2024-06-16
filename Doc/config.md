@@ -1,7 +1,7 @@
 # Config File
 ## Config File Lambda
-> [] : optionnal
-> <> : type
+- [] : optionnal
+- <> : type
 
 ```json
 {
