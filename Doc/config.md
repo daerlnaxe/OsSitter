@@ -50,23 +50,6 @@
         "Alertes": [ ]
 }
 ```
-
-### Alerts
-#### Service configuration
-```JSon
-...
-"Alertes" :[
-    {
-        "nom": "kea-dhcp4",
-        "typeA": "service",
-        "timer":2,
-	"delay_alarm":5
-    }
-....
-```
-
-
-
 ### Description:
 #### Parameters
 - Mail
@@ -75,6 +58,44 @@
     - smtpstring: string to connect to your smtp server
         - outlook: smtp-mail.outlook.com
     - auth : use it if you need a password to use a smtp server
+
+<br>
+
+### Alerts
+#### Service configuration
+
+```JSon
+...
+"Alertes" :[
+    ...
+    {
+        "nom": "<name of the service>",
+        "typeA": "service",
+        "timer":<int value>,
+	"delay_alarm": <int value>
+    }
+    ...
+....
+```
+
+#### Function configuration
+```JSon
+...
+"Alertes" :[
+    ...
+    {
+        "nom": "<name of the service>",
+        "typeA": "function",
+	"trigger": "<value>"
+        "timer":<int value>,
+	"delay_alarm": <int value>
+    }
+    ...
+....
+```
+
+
+
 
 #### Alertes
 - nom
