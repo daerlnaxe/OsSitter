@@ -47,17 +47,25 @@
                 }
         },
 
-        "Alertes": [
-        {
-            "nom": <string> ,
-            "typeA": "<service|function>",
-            ["trigger": "<string>",]
-            "timer": <int>,
-            "delay_alarm": <int>
-        }
-    ]
+        "Alertes": [ ]
 }
 ```
+
+### Alerts
+#### Service configuration
+```JSon
+...
+"Alertes" :[
+    {
+        "nom": "kea-dhcp4",
+        "typeA": "service",
+        "timer":2,
+	"delay_alarm":5
+    }
+....
+```
+
+
 
 ### Description:
 #### Parameters
@@ -75,11 +83,13 @@
   - `function` : integrated functions to help
     - `mem` : Check memory occupation
 - trigger: only for `function`
-- timer : time before check, in...
-- delay_alarm: time before 2 alarms
+- timer : time before check, in minutes
+- delay_alarm: time before 2 alarms, in minutes
 
 <br>
 <br>
+
+
 
 ## Config file modifications
 ### Update 4.11 > 5
