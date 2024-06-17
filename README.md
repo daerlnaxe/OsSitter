@@ -88,38 +88,19 @@ Version x.y.z:
 ## Configuration
 !!! warning Samples certified only for v2 for the while.
 
-### Service configuration
-```JSon
-...
-"Alertes" :[
-    {
-        "nom": "kea-dhcp4",
-        "typeA": "service",
-        "timer":2,
-	"delay_alarm":5
-    }
-....
-```
 
-### SMTP configuration
-```JSon
-"smtp":{
-    "smtpstring": "smtp-mail.outlook.com",	
-	"port": 587,
-	"auth": true,
-	"login": "yourmail@outlook.fr",
-	"app-password": "yourapppass_for_outlook"
-},
-
-```
 
 <br>
 
 # Changelog
-## Alpha 5
-15/06/2024
+## Alpha 5.1
+06/2024
 - New feature: "functions"
     - First, memory test with alerting
+- BugFix:
+	- Hot config loading
+ - Improving:
+ 	- Split for mails part. 
 
 ## Alpha 4.1
 07/01/2024
