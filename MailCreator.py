@@ -127,6 +127,15 @@ class MailCreator(object):
             DxHelios.Say(self, f"Prochaine alarme programmée: {alert.next_alarm}",0,1)
         else:
             DxHelios.Say(self, f"{alert.nom}: pas d'envoi de mail avant: {alert.next_alarm}",0,1)
+            
+            
+    ## Send a mail "restarted service"
+    def mail_functionrestaured(self, alert: Alert, message, title):
+        subject=f"{self.lang.get('function')} '{alert.nom}' - {title} "
+        
+        message=f"Function '{alert.nom}': {message}"            
+        
+        self.alert_mail( subject, message)
         
     """
     Services        ----------------------------
