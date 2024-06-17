@@ -1,4 +1,4 @@
-ve[TOC]
+[TOC]
 
 # OsSitter
 ## New
@@ -34,7 +34,9 @@ It uses a simple json language file to translate as you wish.
     - [ ] free space
     - [ ] Custom command
     - [ ] Securities
-- [ ] Move mails part
+- [x] Move mails part
+- [ ] improving mail features
+	- [ ]  Timestamp
 - [ ] See possibilities to send cli message to all users connected on linux.
 - [ ] I still standing, yeah, yeah, yeah (daily mail)
 
