@@ -43,7 +43,7 @@ class Function:
         
 
     # Memory
-    ## Get free memory in percent
+    ## Get used memory in percent
     def freepercmemory(self):
         rra=[]
         with open('/proc/meminfo') as f:
@@ -55,3 +55,15 @@ class Function:
 
 
 
+    # CPU
+    def freepercpu(self):
+        values=[]
+        with open('/proc/stat') as f:
+            line=f.readline()
+            print (line)
+            tmp=line.replace('\n','').replace("cpu  ",'').split(' ')
+            values=list(map(int,tmp))
+
+        result=int(values[3])*100/ sum(values)
+        print(result)
+        return result
