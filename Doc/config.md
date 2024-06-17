@@ -112,7 +112,7 @@
 
 
 
-## Config file modifications
+## Config file evolution
 ### Update 4.11 > 5
 - typeA: new type `function` => you can use it with name `mem` to alert about memory occupation
 - add `trigger` after `typeA`: used to give a trigger value. Currently used by `mem` function.
