@@ -97,7 +97,7 @@
 
 
 
-#### Alertes
+#### Description
 - nom
 - typeA : type of the alert
   - `service` : check status of a daemon
