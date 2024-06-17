@@ -35,6 +35,7 @@ It uses a simple json language file to translate as you wish.
     - [ ] Custom command
     - [ ] Securities
 - [x] Move mails part
+- [ ] Check installer to verify if Ressources folder is correctly moved during installation.
 - [ ] improving mail features
 	- [ ]  Timestamp
 - [ ] See possibilities to send cli message to all users connected on linux.
