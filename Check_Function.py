@@ -32,12 +32,13 @@ class Function:
     def getresult(self, alert):
         DxHelios.Say(self, f"Function {alert.nom}",1,1)
 
-        if(alert.nom== "mem" ):
+        if(alert.nom== "freemem" ):
             DxHelios.Say(self, f"mem",1,1)
 
             res=self.freepercmemory()
             print (res)
             return  res < int(alert.trigger) , res
+        elif(alert.nom)
 
 
         
@@ -66,4 +67,15 @@ class Function:
 
         result=int(values[3])*100/ sum(values)
         print(result)
+        return result
+        
+        
+    # Disk
+    ## Free Space
+    def freediskspace(self, alert):
+        tmp=subprocess.run(["df","-h", "/dev/sda2"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        tmp=(tmp.stdout).decode('utf-8').split('\n')[1]
+        tmp=re.sub(r'\s+', ' ', tmp)
+        result=tmp.split(' ')[4].replace('%','')
+
         return result
