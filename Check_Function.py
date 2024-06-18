@@ -79,3 +79,13 @@ class Function:
         result=tmp.split(' ')[4].replace('%','')
 
         return result
+        
+        
+    def freediskinode(self, alert):
+        tmp=subprocess.run(["df","-i", "/dev/sda2"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        tmp=(tmp.stdout).decode('utf-8').split('\n')[1]
+        tmp=re.sub(r'\s+', ' ', tmp)
+        result=tmp.split(' ')[4].replace('%','')
+
+        return result
+        
