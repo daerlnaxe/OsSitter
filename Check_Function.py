@@ -31,14 +31,20 @@ class Function:
             
     def getresult(self, alert):
         DxHelios.Say(self, f"Function {alert.nom}",1,1)
-
+        
+        # Return true if res lesser than test
         if(alert.nom== "freemem" ):
-            DxHelios.Say(self, f"mem",1,1)
+            DxHelios.Say(self, f"freemem",1,1)
 
             res=self.freepercmemory()
             print (res)
             return  res < int(alert.trigger) , res
-        elif(alert.nom)
+        elif(alert.nom=="freecpu"):
+            DxHelios.Say(self, f"freecpu",1,1)
+
+            res=self.freecpu()
+            print (res)
+            return  res < int(alert.trigger) , res
 
 
         
@@ -73,7 +79,7 @@ class Function:
     # Disk
     ## Free Space
     def freediskspace(self, alert):
-        tmp=subprocess.run(["df","-h", "/dev/sda2"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        tmp=subprocess.run(["df","-h", alert.param], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         tmp=(tmp.stdout).decode('utf-8').split('\n')[1]
         tmp=re.sub(r'\s+', ' ', tmp)
         result=tmp.split(' ')[4].replace('%','')
@@ -82,7 +88,7 @@ class Function:
         
         
     def freediskinode(self, alert):
-        tmp=subprocess.run(["df","-i", "/dev/sda2"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        tmp=subprocess.run(["df","-i", param], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         tmp=(tmp.stdout).decode('utf-8').split('\n')[1]
         tmp=re.sub(r'\s+', ' ', tmp)
         result=tmp.split(' ')[4].replace('%','')
