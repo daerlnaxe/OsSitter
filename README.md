@@ -31,6 +31,7 @@ It uses a simple json language file to translate as you wish.
     - [ ] uptime
     - [x] free mem
     - [ ] inodes
+    - [ ] Signal when new config.json file consumed
     - [ ] free space
     - [ ] Custom command
     - [ ] Securities
