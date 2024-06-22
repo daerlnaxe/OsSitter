@@ -273,7 +273,7 @@ class OsSitter(object):
                 self.mailer.normal_mail("sigterm")
 
                 # alert
-                pseudoalert=Alert("pseudo", "pseudo", "pseudo", 0, 0)
+                pseudoalert=Alert("pseudo", "pseudo", "pseudo", "pseudo", 0, 0)
                 self.mailer.mail_stoppedservice(pseudoalert)
                 self.mailer.mail_restartedservice(pseudoalert)
 

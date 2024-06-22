@@ -85,13 +85,14 @@ class MailCreator(object):
     """
            
             
-        message+=f"\r\n\r\n{self.lang.get('mail_sign')} OsSitter, {datetime.now()}}." # {self.__class__.__name__}."
+        message+=f"\r\n\r\n{self.lang.get('mail_sign')} OsSitter, {datetime.now()}." # {self.__class__.__name__}."
         
         if self.debugMode:
             DxHelios.DebugMail(self,subject, message)
             #DxHelios.DebugMail(self, self.mail_params)
         
-        
+        print("*******************************************test")
+        print(message)
         mails.Send(self.mail_params.sender, subject , message, self.mail_params);
 
 #---
@@ -103,14 +104,14 @@ class MailCreator(object):
         subject=f"{self.srv_params.server_name} - {subject}"
         message=f"{self.srv_params.server_name}:\r\n\t{ori_message}"
         
-        message+=f"\r\n\r\n{self.lang.get('mail_sign')}, {datetime.now()}}." # {self.__class__.__name__}."
+        message+=f"\r\n\r\n{self.lang.get('mail_sign')}, {datetime.now()}." # {self.__class__.__name__}."
         
         if self.debugMode:
             DxHelios.DebugMail(self,subject, message)
         
         mails.Send(self.mail_params.sender, subject , message, self.mail_params);
 
-
+## ---------------------
     
     """
     Functions       ----------------------------
@@ -131,6 +132,8 @@ class MailCreator(object):
             DxHelios.Say(self, f"Prochaine alarme programmée: {alert.next_alarm}",0,1)
         else:
             DxHelios.Say(self, f"{alert.nom}: pas d'envoi de mail avant: {alert.next_alarm}",0,1)
+
+
             
             
     ## Send a mail "restarted service"
@@ -162,6 +165,7 @@ class MailCreator(object):
             DxHelios.Say(self, f"Prochaine alarme programmée: {alert.next_alarm}",0,1)
         else:
             DxHelios.Say(self, f"{alert.nom}: pas d'envoi de mail avant: {alert.next_alarm}",0,1)
+
 
 
     ## Send a mail "restarted service"

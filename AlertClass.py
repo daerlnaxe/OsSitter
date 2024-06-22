@@ -8,9 +8,9 @@ class Alert:
     def nom(self):
         return self.__nom
 
-"""
-Optionnal
-"""
+    """
+    Optionnal
+    """
     # Alert Type
     @property
     def typeA(self):
@@ -21,9 +21,9 @@ Optionnal
     def param(self):
         return self.__param
  
- """
- Optionnal
- """
+    """
+    Optionnal
+    """
  
     # Alert Trigger
     @property
@@ -66,16 +66,20 @@ Optionnal
     @classmethod
     def dict_toAlert(self, adict:dict):
         typeA= adict["typeA"] 
+        nom=adict["nom"]
+        param=adict.get("param")
+        trigger=adict.get("trigger")
         
-        
-        if( typeA =="function":
-            param=adict.get["param"]
-            trigger=adict.get["trigger"]    
+        print (nom)
+        print(adict)
+        print(nom)
+
+        if( typeA =="function"):
             
             if(trigger==None):
-                raise Exception(f"Function {adict["nom"]}: Trigger is null")
-            elif((adict["nom"] != "freemem" or adict["nom"]!= "freecpu") and param==None):
-                raise Exception(f"Function {adict["nom"]}: Param is null")
+                raise Exception(f"Function {nom}: Trigger is null")
+            elif((adict["nom"] != "freemem" and adict["nom"]!= "freecpu") and param==None):
+                raise Exception(f"Function {nom}: Param is null")
         
         return Alert(adict["nom"], adict["typeA"], param, trigger,adict["timer"], adict["delay_alarm"])
         """elif (typeA=="function"):
