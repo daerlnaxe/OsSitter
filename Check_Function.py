@@ -32,13 +32,13 @@ class Function:
     def getresult(self, alert):
         DxHelios.Say(self, f"Function {alert.nom}",1,1)
         
-        # Return true if res lesser than test
+        # Return true if res greater than test
         if(alert.nom== "freemem" ):
             DxHelios.Say(self, f"freemem",1,1)
 
             res=self.freepercmemory()
             print (res)
-            return  res < int(alert.trigger) , res
+            return  res > int(alert.trigger) , res
         elif(alert.nom=="freecpu"):
             DxHelios.Say(self, f"freecpu",1,1)
 

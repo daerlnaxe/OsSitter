@@ -408,7 +408,7 @@ class OsSitter(object):
                     # Alerting
                     ## Etat ok
                     if old_state and alert.state:
-                        DxHelios.Say(self,f"Mémoire inférieure à {alert.trigger}: {res[1]}",0,1)
+                        DxHelios.Say(self,f"Mémoire libre supérieure à {alert.trigger}: {res[1]}",0,1)
                     ## Etat de la fonction, restauré
                     elif old_state is False and alert.state:
                         msg=f"Mémoire revenue à {alert.trigger} : {res[1]}"
@@ -416,7 +416,7 @@ class OsSitter(object):
                         self.mailer.mail_functionrestaured( alert, msg, "mémoire ok")                
                     ## Etat de la fonction, critique
                     elif alert.state is False:  
-                        msg=f"Mémoire supérieure à {alert.trigger}: {res[1]}"
+                        msg=f"Mémoire libre inférieure à {alert.trigger}: {res[1]}"
                         DxHelios.Say(self, msg,0,1)
                         self.mailer.mail_function( alert, msg, "alerte mémoire")
                     ## Autre
