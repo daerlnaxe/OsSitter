@@ -3,7 +3,7 @@
 
 """
 Author: Alexandre Codoul
-Version: See above
+Version: 1.1
 Required Python 3.6
 
 Linux :
@@ -85,7 +85,7 @@ class MailCreator(object):
     """
            
             
-        message+=f"\r\n\r\n{self.lang.get('mail_sign')} {self.__class__.__name__}."
+        message+=f"\r\n\r\n{self.lang.get('mail_sign')} OsSitter, {datetime.now()}}." # {self.__class__.__name__}."
         
         if self.debugMode:
             DxHelios.DebugMail(self,subject, message)
@@ -94,6 +94,8 @@ class MailCreator(object):
         
         mails.Send(self.mail_params.sender, subject , message, self.mail_params);
 
+#---
+
     # Alerte générique utilisée par les autres fonctions
     def alert_mail(self, subject, ori_message):    
         # Creation of the object to send mails
@@ -101,12 +103,14 @@ class MailCreator(object):
         subject=f"{self.srv_params.server_name} - {subject}"
         message=f"{self.srv_params.server_name}:\r\n\t{ori_message}"
         
-        message+=f"\r\n\r\n{self.lang.get('mail_sign')} {self.__class__.__name__}."
+        message+=f"\r\n\r\n{self.lang.get('mail_sign')}, {datetime.now()}}." # {self.__class__.__name__}."
         
         if self.debugMode:
             DxHelios.DebugMail(self,subject, message)
         
         mails.Send(self.mail_params.sender, subject , message, self.mail_params);
+
+
     
     """
     Functions       ----------------------------
@@ -136,6 +140,10 @@ class MailCreator(object):
         message=f"Function '{alert.nom}': {message}"            
         
         self.alert_mail( subject, message)
+        
+        
+
+
         
     """
     Services        ----------------------------
