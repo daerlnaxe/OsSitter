@@ -65,6 +65,11 @@ class MailCreator(object):
             subject+=self.lang.get('alert_stopped')
         elif mailtype=="sigterm":
             subject+=f"SIGTERM"
+        elif mailtype=="reloadconf":
+            subject+=f"changement de la configuration"
+        elif mailtype=="reloadconffailed":
+            subject+=f"echec de changement de la configuration"
+            
         
         # message
         if mailtype == "just_a_test":    
@@ -83,7 +88,10 @@ class MailCreator(object):
             
     {self.lang.get('warning_nowtch')}
     """
-           
+        elif mailtype=="reloadconf":
+            message+=f"configuration modified"
+        elif mailtype=="reloadconffailed":
+            subject+=f"failed to modify configuration"
             
         message+=f"\r\n\r\n{self.lang.get('mail_sign')} OsSitter, {datetime.now()}." # {self.__class__.__name__}."
         

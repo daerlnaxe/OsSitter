@@ -192,9 +192,9 @@ class OsSitter(object):
                 Config.CF_Builder(filePath)
                 
             DxHelios.Say(self, f"{lang.get('load_cfg')}", ind_mess= 1)
-            self.__config= Config.Factory(filePath)            
+            self.__config= Config.Factory(filePath)
+        # Load a new config file
         else:  
-            
             DxHelios.Say(self, f"{lang.get('load_newcfg')}", ind_mess= 1)
             try:
                 self.__config= Config.Factory(filePath)
@@ -206,9 +206,12 @@ class OsSitter(object):
                 #new_config= Config.Factory()
                 # self.__config=new_config
                 # self.__debugMode = server_params.debug
+                self.mailer.normail_mail("reloadconf")
+
             except Exception as exc:
                 DxHelios.Error(self,f"{lang.get('err_cfgload')}", exc)
                 print(exc)
+                self.mailer.normail_mail("reloadconffailed")
                 return False
             
         
@@ -331,6 +334,7 @@ class OsSitter(object):
             if os.path.isfile("./new-config.json"):
                 self.InitConfig("./new-config.json",reload=True)
                 self.__config.InitAlerts(datetime.now())
+                
 
             # Force to reload a new language file
             if os.path.isfile("./new-lang.json"):
