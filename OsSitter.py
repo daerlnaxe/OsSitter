@@ -206,12 +206,12 @@ class OsSitter(object):
                 #new_config= Config.Factory()
                 # self.__config=new_config
                 # self.__debugMode = server_params.debug
-                self.mailer.normail_mail("reloadconf")
+                self.mailer.normal_mail("reloadconf")
 
             except Exception as exc:
                 DxHelios.Error(self,f"{lang.get('err_cfgload')}", exc)
                 print(exc)
-                self.mailer.normail_mail("reloadconffailed")
+                self.mailer.normal_mail("reloadconffailed")
                 return False
             
         
