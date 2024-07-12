@@ -1,8 +1,8 @@
 #!/bin/bash
 # coding: utf-8
 
-echo "Uninstall service"
-
+echo "### Welcome to OsSitter uninstaller for version 1.1"
+echo "Compatible OsSitter v5.x/4.x"
 
 systemctl stop ossitter.service
 systemctl status ossitter.service

@@ -4,7 +4,7 @@
 # Make me executable by using 'sudo chmod +x LinuxInstaller.sh'
 # Then run me by using 'sudo ./LinuxInstaller.sh'
 echo "### Welcome to OsSitter installer for version 1.1"
-echo "Compatible OsSitter v4/4.1"
+echo "Compatible OsSitter v5.x/4.x"
 echo "Note: The configuration file will not be overwritten"
 # stop if error
 
