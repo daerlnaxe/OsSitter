@@ -9,7 +9,7 @@ systemctl status ossitter.service
 systemctl disable ossitter.service
 
 echo "Removing ossitter.service"
-rm /lib/systemd/system/ossitter.service
+rm /etc/systemd/system/ossitter.service
 systemctl daemon-reload
 
 echo "for the while you must delete OsSitter manually"
