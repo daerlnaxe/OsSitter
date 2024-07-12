@@ -33,7 +33,7 @@ from MailCreator import MailCreator
 
 
 class OsSitter(object):
-    __version="a5.1"
+    __version="a5.2"
 
     # Used to quit loop
     __stopped=False
@@ -412,17 +412,17 @@ class OsSitter(object):
                     # Alerting
                     ## Etat ok
                     if old_state and alert.state:
-                        DxHelios.Say(self,f"Mémoire libre supérieure à {alert.trigger}: {res[1]}",0,1)
+                        DxHelios.Say(self,f"{alert.nom}, stat supérieure à {alert.trigger}: {res[1]}",0,1)
                     ## Etat de la fonction, restauré
                     elif old_state is False and alert.state:
-                        msg=f"Mémoire revenue à {alert.trigger} : {res[1]}"
+                        msg=f"{alert.nom}, stat revenue sous {alert.trigger} : {res[1]}"
                         DxHelios.Say(self,msg,0,1)
-                        self.mailer.mail_functionrestaured( alert, msg, "mémoire ok")                
+                        self.mailer.mail_functionrestaured( alert, msg, f"{alert.nom}} - Restauration")                
                     ## Etat de la fonction, critique
                     elif alert.state is False:  
-                        msg=f"Mémoire libre inférieure à {alert.trigger}: {res[1]}"
+                        msg=f"{alert.nom}, alarme --> stat inférieure à {alert.trigger}: {res[1]}"
                         DxHelios.Say(self, msg,0,1)
-                        self.mailer.mail_function( alert, msg, "alerte mémoire")
+                        self.mailer.mail_function( alert, msg, f"{alert.nom} - Alerte")
                     ## Autre
                     else:
                         raise ValueError(lang.get('err_value'))       

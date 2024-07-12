@@ -42,16 +42,32 @@ class Function:
         elif(alert.nom=="freecpu"):
             DxHelios.Say(self, f"freecpu",1,1)
 
-            res=self.freecpu()
+            res=self.freecpuperc()
             print (res)
-            return  res < int(alert.trigger) , res
+            return  res > int(alert.trigger) , res
+        
+        elif(alert.nom=="freediskspace"):
+            DxHelios.Say(self, f"freediskspace",1,1)
 
+            res=self.freediskspaceperc()
+            print (res)
+            return  res > int(alert.trigger) , res
+        
+            
+        elif(alert.nom=="freediskinode"):
+            DxHelios.Say(self, f"freediskinode",1,1)
+
+            res=self.freediskinodeperc()
+            print (res)
+            return  res > int(alert.trigger) , res
 
         
 
+
+
     # Memory
     ## Get used memory in percent
-    def freepercmemory(self):
+    def freememoryperc(self):
         rra=[]
         with open('/proc/meminfo') as f:
             rra=f.read().split('\n')
@@ -63,7 +79,7 @@ class Function:
 
 
     # CPU
-    def freepercpu(self):
+    def freecpuperc(self):
         values=[]
         with open('/proc/stat') as f:
             line=f.readline()
@@ -78,7 +94,7 @@ class Function:
         
     # Disk
     ## Free Space
-    def freediskspace(self, alert):
+    def freediskspaceperc(self, alert):
         tmp=subprocess.run(["df","-h", alert.param], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         tmp=(tmp.stdout).decode('utf-8').split('\n')[1]
         tmp=re.sub(r'\s+', ' ', tmp)
@@ -87,7 +103,7 @@ class Function:
         return result
         
         
-    def freediskinode(self, alert):
+    def freediskinodeperc(self, alert):
         tmp=subprocess.run(["df","-i", param], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         tmp=(tmp.stdout).decode('utf-8').split('\n')[1]
         tmp=re.sub(r'\s+', ' ', tmp)

@@ -102,7 +102,10 @@
 - typeA : type of the alert
   - `service` : check status of a daemon
   - `function` : integrated functions to help
-    - `mem` : Check memory occupation
+    - `freemem` : Check memory occupation
+    - `freecpu` : Check cpu
+    - `freediskspace` : Check disk space
+    - `freediskinode` : Check disk inodes
 - trigger: only for `function`
 - timer : time before check, in minutes
 - delay_alarm: time before 2 alarms, in minutes
