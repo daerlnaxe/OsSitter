@@ -417,7 +417,7 @@ class OsSitter(object):
                     elif old_state is False and alert.state:
                         msg=f"{alert.nom}, stat revenue sous {alert.trigger} : {res[1]}"
                         DxHelios.Say(self,msg,0,1)
-                        self.mailer.mail_functionrestaured( alert, msg, f"{alert.nom}} - Restauration")                
+                        self.mailer.mail_functionrestaured( alert, msg, f"{alert.nom} - Restauration")                
                     ## Etat de la fonction, critique
                     elif alert.state is False:  
                         msg=f"{alert.nom}, alarme --> stat inférieure à {alert.trigger}: {res[1]}"

@@ -36,7 +36,7 @@ class Function:
         if(alert.nom== "freemem" ):
             DxHelios.Say(self, f"freemem",1,1)
 
-            res=self.freepercmemory()
+            res=self.freememoryperc()
             print (res)
             return  res > int(alert.trigger) , res
         elif(alert.nom=="freecpu"):

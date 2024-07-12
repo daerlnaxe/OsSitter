@@ -11,7 +11,11 @@ Restart=on-failure
 
 # Don't touch !
 User={ch_user}		
-ExecStart=/bin/bash -c 'cd {InstallFolder} && ./OsSitter.py > ossitter.log'
+#ExecStart=/bin/bash -c 'cd {InstallFolder} && ./OsSitter.py > ossitter.log'
+ExecStart=/bin/bash -c 'cd {InstallFolder} && ./OsSitter.py'
+StandardOutput={InstallFolder}/ossitter.log
+StandardError={InstallFolder}/ossitter-err.log
+
 
 
 [Install]
