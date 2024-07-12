@@ -7,7 +7,7 @@ TODO:
 """
 import subprocess
 import sys
-import DxHelios
+from DxHelios import DxHelios
 
 
 #@staticmethod

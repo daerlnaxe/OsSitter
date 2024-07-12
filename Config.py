@@ -4,7 +4,7 @@ Version: Alpha 4.1
 """
 
 import json
-import DxHelios
+from DxHelios import DxHelios
 from typing import List
 from AlertClass import Alert
 from MailSender import Mail_Block, Mail_Obj

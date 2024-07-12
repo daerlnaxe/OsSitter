@@ -14,7 +14,8 @@ from MailSender import Mails
 from AlertClass import Alert
 from datetime import datetime, timedelta
 
-import DxHelios
+#import DxHelios
+from DxHelios import DxHelios
 
 
 class MailCreator(object):

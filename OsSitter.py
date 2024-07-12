@@ -17,7 +17,7 @@ import os
 import sys
 import time
 import json 
-import DxHelios
+from DxHelios import DxHelios
 from AlertClass import Alert
 from Config import Config
 from Check_Service import Service
@@ -33,7 +33,7 @@ from MailCreator import MailCreator
 
 
 class OsSitter(object):
-    __version="a5.2"
+    __version="a5.3"
 
     # Used to quit loop
     __stopped=False
@@ -100,7 +100,7 @@ class OsSitter(object):
     def term_method(self, signum, frame):
         print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_method')
         
-        self.normal_mail("sigterm")
+        self.mailer.normal_mail("sigterm")
 
         print(f"------------ Envoi de mail SIGTERM")
         self.__stopped=True
@@ -121,13 +121,13 @@ class OsSitter(object):
     """
     def __init__(self):
         # Prez
-        print('#'*52)
-        print('#' + ' '*50 + '#')
+        DxHelios.Say('#'*52)
+        DxHelios.Say('#' + ' '*50 + '#')
         
         #OsSitter: 8 chars
-        print('#' +' '*17 +  f"OsSitter - v{self.__version}" +' '*17+ '#')
-        print('#' + ' '*50 + '#')
-        print('#'*52)
+        DxHelios.Say('#' +' '*17 +  f"OsSitter - v{self.__version}" +' '*17+ '#')
+        DxHelios.Say('#' + ' '*50 + '#')
+        DxHelios.Say('#'*52)
         
         self.InitLanguage()
         
@@ -184,6 +184,10 @@ class OsSitter(object):
     """ Initialize Configuration
     """
     def InitConfig(self, fileName="./config.json", reload=False):
+        ############ temporaire #############
+        DxHelios.static_output=0
+        DxHelios.set_outpufile("./ossitter.log")
+    
         filePath=os.path.join( self.__directory, fileName  )
         
         # Chargement de la configuration
@@ -459,6 +463,8 @@ Starting point
 """
 if __name__ == '__main__':    
     sup = OsSitter()
+    Helios=DxHelios()
+    
     if not sup.test():
         DxHelios.Say("__main__", "Tests echoués")
         sys.exit()
