@@ -1,4 +1,4 @@
-Ban de outlook? 
+Ban de outlook : [page](https://support.microsoft.com/en-us/office/sending-limits-in-outlook-com-279ee200-594c-40f0-9ec8-bb6af7735c2e)
 ```
 Traceback (most recent call last):
   File "/home/supervision/./OsSitter.py", line 482, in <module>
