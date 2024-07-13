@@ -18,7 +18,6 @@ class DxHelios:
         DxHelios.fileToWrite = open(file, "a");
         
 
-
     @staticmethod
     def get_sender(who):    
         if type(who) == str:
@@ -33,10 +32,11 @@ class DxHelios:
             if(type(message) != str):
                 message=message. __str__()
                 
-            DxHelios.fileToWrite.write(message)
+            DxHelios.fileToWrite.write(f"{message}\r\n")
             DxHelios.fileToWrite.flush()
         elif(DxHelios.static_output==1):
             print(message)
+
     
     @staticmethod
     # Write like 'who {tab} | {tab} message'
@@ -47,13 +47,14 @@ class DxHelios:
         #print("{}{} | {}{}".format(DxHelios.DxHelios.get_sender(who),"\t"*ind_class,"\t"*ind_mess, message))
         #print(f"{DxHelios.get_sender(who)}"+"\t"*ind_class+" | " + "\t"*ind_mess + message) <-- Risque d'erreurs si None
 
+
     @staticmethod
     # Write like 'who {tab} | {tab} --Debug-- message'
-    def Debug (who, message: str, ind_class=0, ind_mess=0):
-        
+    def Debug (who, message: str, ind_class=0, ind_mess=0):        
         #print("{}{} | {}--Debug-- {}".format(DxHelios.get_sender(who), "\t"*ind_class, "\t"*ind_mess, message))
         DxHelios.write_message("{}{} | {}--Debug-- {}".format(DxHelios.get_sender(who), "\t"*ind_class, "\t"*ind_mess, message))
         #print(f"{DxHelios.get_sender(who)}"+"\t"*ind_class+" | " + "\t"*ind_mess + "--Debug-- " + message)
+
 
     @staticmethod
     def Warning (who, message):
@@ -66,6 +67,7 @@ class DxHelios:
         
         DxHelios.Jump()
 
+
     @staticmethod
     def Error (who,message,exc):
         DxHelios.write_message(">"*20+ DxHelios.get_sender(who))
@@ -75,6 +77,7 @@ class DxHelios:
         DxHelios.write_message(repr(traceback.extract_tb(exc.__traceback__)))
         DxHelios.write_message(exc)
 
+
     @staticmethod
     # write a title like #### who - bable ###
     def Title(who , title):
@@ -82,20 +85,24 @@ class DxHelios:
         DxHelios.write_message("{}{} - {}{}".format('#'*mult, DxHelios.get_sender(who), title,'#'*mult))
         #print('#'*mult+f" {DxHelios.get_sender(who)} - {title} " +'#'*mult)
 
+
     @staticmethod
     # Draw a line
     def DrawLine():
         DxHelios.write_message('-'*200)
+
 
     @staticmethod    
     # Write directly    
     def SayRaw(message):
         DxHelios.write_message(message)
 
+
     @staticmethod
     # Jump a line
     def Jump():
         DxHelios.write_message('')
+
         
     @staticmethod    
     def ShowParams(who, title, obj, param, debug=False):
@@ -107,6 +114,7 @@ class DxHelios:
         DxHelios.DrawLine()
         DxHelios.SayRaw(param)
         DxHelios.Jump()
+
     
     @staticmethod    
     def DebugMail(who, subject, message):

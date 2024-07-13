@@ -100,8 +100,8 @@ class MailCreator(object):
             DxHelios.DebugMail(self,subject, message)
             #DxHelios.DebugMail(self, self.mail_params)
         
-        print("*******************************************test")
-        print(message)
+        DxHelios.Say(self, "*"*10 + " SIMULATION " + "*"*10)
+        DxHelios.Say(self, message)
         mails.Send(self.mail_params.sender, subject , message, self.mail_params);
 
 #---
@@ -127,12 +127,14 @@ class MailCreator(object):
     """
     # Function
     def mail_function(self, alert: Alert, message, title):
-        print (alert)
-        print (type(alert))
+        #print (alert)
+        #print (type(alert))
+        print(alert.__str__())
         
         # Keep a respectuous mail flow
         if alert.next_alarm == None or datetime.now() > alert.next_alarm:
-            subject=f"{self.lang.get('function')} '{alert.nom}' - {title} "
+            print(self.lang.get('mail_type_function'))
+            subject=f"{self.lang.get('mail_type_function')} '{alert.nom}' - {title} "
             message=f"Function '{alert.nom}': {message}"
             self.alert_mail( subject, message)
 
@@ -147,7 +149,9 @@ class MailCreator(object):
             
     ## Send a mail "restarted service"
     def mail_functionrestaured(self, alert: Alert, message, title):
-        subject=f"{self.lang.get('function')} '{alert.nom}' - {title} "
+        print(alert.__str__())
+        
+        subject=f"{self.lang.get('mail_type_function')} '{alert.nom}' - {title} "
         
         message=f"Function '{alert.nom}': {message}"            
         

@@ -91,18 +91,25 @@ class OsSitter(object):
         
     def term_func(self, signum, frame):
         #global is_shutdown
-        print(frame)
-        print(signum)
+        
+        #-print(frame)
+        DxHelios.Say(self, frame)
+        #-print(signum)
+        DxHelios.Say(self, signum)
+        
         #is_shutdown = True
-        print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_func')
+        #-print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_func')
+        DxHelios.Say(self, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_func')
     
 
     def term_method(self, signum, frame):
-        print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_method')
+        #-print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_method')
+        DxHelios.Say(self, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_method')
         
         self.mailer.normal_mail("sigterm")
 
-        print(f"------------ Envoi de mail SIGTERM")
+        #-print(f"------------ Envoi de mail SIGTERM")
+        DxHelios.Say(self, f"------------ Envoi de mail SIGTERM")
         self.__stopped=True
      
 
@@ -110,7 +117,7 @@ class OsSitter(object):
     def __new__(cls): # __new__ classmethod implicite: la classe 1e paramètre
         #méthode de construction standard
         if cls._instance is None:
-            print("CLS: construction")
+            print("CLS: construction")          
             # Get directory
             cls.__directory=os.path.dirname(os.path.realpath(__file__))
         
@@ -121,13 +128,13 @@ class OsSitter(object):
     """
     def __init__(self):
         # Prez
-        DxHelios.Say('#'*52)
-        DxHelios.Say('#' + ' '*50 + '#')
+        DxHelios.Say(self, '#'*52)
+        DxHelios.Say(self, '#' + ' '*50 + '#')
         
         #OsSitter: 8 chars
-        DxHelios.Say('#' +' '*17 +  f"OsSitter - v{self.__version}" +' '*17+ '#')
-        DxHelios.Say('#' + ' '*50 + '#')
-        DxHelios.Say('#'*52)
+        DxHelios.Say(self, '#' +' '*17 +  f"OsSitter - v{self.__version}" +' '*17+ '#')
+        DxHelios.Say(self, '#' + ' '*50 + '#')
+        DxHelios.Say(self, '#'*52)
         
         self.InitLanguage()
         
@@ -184,9 +191,7 @@ class OsSitter(object):
     """ Initialize Configuration
     """
     def InitConfig(self, fileName="./config.json", reload=False):
-        ############ temporaire #############
-        DxHelios.static_output=0
-        DxHelios.set_outpufile("./ossitter.log")
+
     
         filePath=os.path.join( self.__directory, fileName  )
         
@@ -393,7 +398,10 @@ class OsSitter(object):
                     ## Service revenu
                     elif old_state is False and alert.state:                    
                         DxHelios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_rst')}",0,1)
-                        self.mailer.mail_restartedservice( alert)                
+                        self.mailer.mail_restartedservice( alert)       
+
+                        alert.next_alarm=None
+                        
                     ## Service stoppé
                     elif alert.state is False:  
                         DxHelios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_stpd')}",0,1)
@@ -412,21 +420,23 @@ class OsSitter(object):
                     if old_state==None:
                         old_state=alert.state
             
-            
+
                     # Alerting
                     ## Etat ok
-                    if old_state and alert.state:
+                    if old_state and alert.state:                        
                         DxHelios.Say(self,f"{alert.nom}, stat supérieure à {alert.trigger}: {res[1]}",0,1)
                     ## Etat de la fonction, restauré
                     elif old_state is False and alert.state:
-                        msg=f"{alert.nom}, stat revenue sous {alert.trigger} : {res[1]}"
-                        DxHelios.Say(self,msg,0,1)
-                        self.mailer.mail_functionrestaured( alert, msg, f"{alert.nom} - Restauration")                
+                        msg=f"stat revenue sous {alert.trigger} : {res[1]}"
+                        DxHelios.Say(self, f"{alert.nom} - {msg}",0,1)
+                        self.mailer.mail_functionrestaured( alert, msg, "Restauration")  
+
+                        alert.next_alarm=None
                     ## Etat de la fonction, critique
                     elif alert.state is False:  
-                        msg=f"{alert.nom}, alarme --> stat inférieure à {alert.trigger}: {res[1]}"
-                        DxHelios.Say(self, msg,0,1)
-                        self.mailer.mail_function( alert, msg, f"{alert.nom} - Alerte")
+                        msg=f"alarme --> stat inférieure à {alert.trigger}: {res[1]}"
+                        DxHelios.Say(self, f"{alert.nom} - {msg}",0,1)
+                        self.mailer.mail_function( alert, msg, "Alerte")
                     ## Autre
                     else:
                         raise ValueError(lang.get('err_value'))       
@@ -437,7 +447,7 @@ class OsSitter(object):
                 ## Common / Next Execution
                 if (alert.typeA =="service" or alert.typeA == "function"):
                     self.config.set_nextexecution(alert)
-                    DxHelios.Say(self, f"{lang.get('next_execset')} {alert.next_execution}",0,1)
+                    DxHelios.Say(self, f"{lang.get('next_execset')}  {alert.next_execution} ({alert.timer})",0,1 )
 
 
                 # Gestion du check    
@@ -456,12 +466,16 @@ class OsSitter(object):
     # body of destructor
     def __del__(self):
         DxHelios.Title(self, f"{lang.get('destruct')} {self.__class__.__name__}")
+        print("OsSitter Stopped")
 
 
 """
 Starting point    
 """
 if __name__ == '__main__':    
+    ############ temporaire #############
+    DxHelios.static_output=0
+    DxHelios.set_outpufile("./ossitter.log")
     sup = OsSitter()
     Helios=DxHelios()
     

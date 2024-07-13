@@ -49,6 +49,7 @@
 	"mail_testsok":"Test des mails: success",
 	"mail_testsfail":"Test des mails: failed",
 	"mail_rsignal":"Réception d'un signal",
+	"mail_type_function": "Fonction",
 	
 	"next_exec": "Réglage de l'éxécution de",
 	"next_execset":"Réglage de la prochaine éxécution :",
@@ -57,7 +58,7 @@
 	"service_test":"Test du nom pour le service",
 	
 	"warning_nowtch":"Le serveur n'est plus surveillé ou a été redémarré.",
-		"warning_mutemode":"Le serveur ne peut pas envoyer de mails",
+	"warning_mutemode":"Le serveur ne peut pas envoyer de mails",
 	
 	
 	

@@ -69,7 +69,8 @@ class Alert:
         nom=adict["nom"]
         param=adict.get("param")
         trigger=adict.get("trigger")
-
+        
+        print(f"{nom} : {param}")
 
         if( typeA =="function"):
             
