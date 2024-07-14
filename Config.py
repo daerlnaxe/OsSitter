@@ -4,7 +4,7 @@ Version: Alpha 4.1
 """
 
 import json
-from DxHelios import DxHelios
+#from DxHelios import DxHelios
 from typing import List
 from AlertClass import Alert
 from MailSender import Mail_Block, Mail_Obj
@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
       
 
 class Parameters_Obj:
+
     @property
     def server_name(self):
         return self.__server_name
@@ -62,6 +63,10 @@ class Parameters_Obj:
 
 # Root for config object
 class Config:
+    #Static
+    Helios=None
+
+
     @property
     def parameters(self):
         return self.__Parameters
@@ -124,10 +129,7 @@ class Config:
 
     # create Factory static method
     @staticmethod
-    def Factory(filePath):
-        DxHelios.Say("Config", f"Chargement du fichier de configuration: {filePath}",1,1)
-        
-        
+    def Factory(filePath):        
         with open(filePath, "r") as f:
             json_data = f.read()
 
@@ -140,7 +142,7 @@ class Config:
     """
     @staticmethod
     def CF_Builder(filePath):
-        DxHelios.Say("Config", f"Création du fichier de configuration: {filePath}",1,1)
+
         
         json_content="""{
 	"Version":"Alpha4",		

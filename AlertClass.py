@@ -76,7 +76,7 @@ class Alert:
             
             if(trigger==None):
                 raise Exception(f"Function {nom}: Trigger is null")
-            elif((adict["nom"] != "freemem" and adict["nom"]!= "freecpu") and param==None):
+            elif((adict["nom"] != "freemem" and adict["nom"]!= "freevscpu") and param==None):
                 raise Exception(f"Function {nom}: Param is null")
         
         return Alert(adict["nom"], adict["typeA"], param, trigger,adict["timer"], adict["delay_alarm"])

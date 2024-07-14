@@ -7,12 +7,14 @@ TODO:
 """
 import subprocess
 import sys
-from DxHelios import DxHelios
 import re
+from DxHelios import DxHelios
 
 
 #@staticmethod
 class Function:
+    Helios=None
+
     @property
     def lang(self):
         return self.__lang__
@@ -30,35 +32,38 @@ class Function:
    
             
     def getresult(self, alert):
-        DxHelios.Say(self, f"Function {alert.nom}",1,1)
+        self.Helios.Say(self, f"Function {alert.nom}",1,1)
         
         # Return true if res greater than test
         if(alert.nom== "freemem" ):
-            DxHelios.Say(self, f"freemem",1,1)
+            self.Helios.Say(self, f"freemem",1,1)
 
             res=self.freememoryperc()
             print (res)
             return  res > int(alert.trigger) , res
         elif(alert.nom=="freecpu"):
-            DxHelios.Say(self, f"freecpu",1,1)
+            raise("deprecated")
+            #self.Helios.Say(self, f"freecpu",1,1)
 
-            res=self.freecpuperc()
-            print (res)
-            return  res > int(alert.trigger) , res
-        
+            #res=self.freecpuperc()            
+            #return  res > int(alert.trigger) , res
+        elif(alert.nom=="freevscpu"):
+            self.Helios.Say(self, f"freevscpu")
+            res=self.freevscpuperc()
+            
+            return res > int(alert.trigger), res
+            
         elif(alert.nom=="freediskspace"):
-            DxHelios.Say(self, f"freediskspace",1,1)
+            self.Helios.Say(self, f"freediskspace",1,1)
 
             res=self.freediskspaceperc(alert)
-            print (res)
             return  res > int(alert.trigger) , res
         
             
         elif(alert.nom=="freediskinode"):
-            DxHelios.Say(self, f"freediskinode",1,1)
+            self.Helios.Say(self, f"freediskinode",1,1)
 
             res=self.freediskinodeperc(alert)
-            print (res)
             return  res > int(alert.trigger) , res
 
         
@@ -78,19 +83,17 @@ class Function:
 
 
 
-    # CPU
-    def freecpuperc(self):
-        values=[]
-        with open('/proc/stat') as f:
-            line=f.readline()
-            print (line)
-            tmp=line.replace('\n','').replace("cpu  ",'').split(' ')
-            values=list(map(int,tmp))
 
-        result=int(values[3])*100/ sum(values)
-        print(result)
-        return result
+    
+    def freevscpuperc(self):
+        check = subprocess.run(["vmstat", "1", "2"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        tmp=(check.stdout).decode('utf-8').split('\n')[3]
+        # replace n space by a space, then split by space
+        tmp=re.sub(r'\s+', ' ', tmp.strip()).split(' ')
+        print(f"vscpu: tmp[14]")
         
+        return int(tmp[14])
+    
         
     # Disk
     ## Free Space
@@ -122,7 +125,7 @@ class Function:
         # in case of error
         #if(len(tmp)==1):
         #    print(tmp)
-        #    DxHelios.Say(self, tmp)
+        #    self.Helios.Say(self, tmp)
            
         tmp=(tmp.stdout).decode('utf-8').split('\n')[1]
         tmp=re.sub(r'\s+', ' ', tmp)

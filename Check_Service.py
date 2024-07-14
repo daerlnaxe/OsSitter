@@ -12,6 +12,8 @@ from DxHelios import DxHelios
 
 #@staticmethod
 class Service:
+    Helios=None
+    
     @property
     def lang(self):
         return self.__lang__
@@ -38,15 +40,15 @@ class Service:
         check = subprocess.run(["systemctl", "status", varService], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         if (b"could not be found" in check.stderr):
-            DxHelios.Say(self, f"{self.lang['service_test']} {varService} : {self.lang['failed']}",1,1)
+            self.Helios.Say(self, f"{self.lang['service_test']} {varService} : {self.lang['failed']}",1,1)
             raise ValueError(f"{self.lang['err_unknownservice']} {varService}")
             
-        DxHelios.Say(self, f"{self.lang['service_test']} {varService} : {self.lang['success']}",1,1)
+        self.Helios.Say(self, f"{self.lang['service_test']} {varService} : {self.lang['success']}",1,1)
                 
     
             
     def checkservice(self, varService:str):
-        DxHelios.Say(self, f"Test de {varService}",1,1)
+        self.Helios.Say(self, f"Test de {varService}",1,1)
         
         if self.osDetected=="windows":
             raise NotImplementedError(self.__class__.__name__ ) 

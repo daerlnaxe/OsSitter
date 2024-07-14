@@ -20,6 +20,9 @@ from DxHelios import DxHelios
 
 class MailCreator(object):
 
+    Helios=None
+
+
     @property
     def debugMode(self):
         return self.__debugMode
@@ -41,7 +44,7 @@ class MailCreator(object):
         return self.__mail_params
         
     # Builder    
-    def __init__(self, lang, srv_params):
+    def __init__(self, lang, srv_params):        
         self.__lang__=lang
         self.__srv_params=srv_params
         self.__mail_params =  srv_params.mail
@@ -53,7 +56,10 @@ class MailCreator(object):
     #
     def normal_mail(self, mailtype):
         # Creation of the object to send mails
-        mails=Mails()
+        mails=Mails()        
+        
+        print(self.mail_params)
+        
         subject=f"{self.srv_params.server_name} - "
         message=f"{self.srv_params.server_name}:\r\n"
         
@@ -97,28 +103,31 @@ class MailCreator(object):
         message+=f"\r\n\r\n{self.lang.get('mail_sign')} OsSitter, {datetime.now()}." # {self.__class__.__name__}."
         
         if self.debugMode:
-            DxHelios.DebugMail(self,subject, message)
-            #DxHelios.DebugMail(self, self.mail_params)
+            self.Helios.DebugMail(self,subject, message)
+            #self.Helios.DebugMail(self, self.mail_params)
         
-        DxHelios.Say(self, "*"*10 + " SIMULATION " + "*"*10)
-        DxHelios.Say(self, message)
-        mails.Send(self.mail_params.sender, subject , message, self.mail_params);
+        self.Helios.Say(self, "*"*10 + " SIMULATION " + "*"*10)
+        self.Helios.Say(self, message)
+        res=mails.Send(self.mail_params.sender, subject , message, self.mail_params);
+        self.Helios.Say(mails, res)
 
 #---
 
     # Alerte générique utilisée par les autres fonctions
     def alert_mail(self, subject, ori_message):    
         # Creation of the object to send mails
-        mails=Mails()
+        mails=Mails()        
+        
         subject=f"{self.srv_params.server_name} - {subject}"
         message=f"{self.srv_params.server_name}:\r\n\t{ori_message}"
         
         message+=f"\r\n\r\n{self.lang.get('mail_sign')}, {datetime.now()}." # {self.__class__.__name__}."
         
         if self.debugMode:
-            DxHelios.DebugMail(self,subject, message)
+            self.Helios.DebugMail(self,subject, message)
         
-        mails.Send(self.mail_params.sender, subject , message, self.mail_params);
+        res=mails.Send(self.mail_params.sender, subject , message, self.mail_params);
+        self.Helios.Say(mails, res)
 
 ## ---------------------
     
@@ -140,9 +149,9 @@ class MailCreator(object):
 
             # Assign time for the next alert
             alert.next_alarm = datetime.now() + timedelta(minutes=alert.delay_alarm)
-            DxHelios.Say(self, f"Prochaine alarme programmée: {alert.next_alarm}",0,1)
+            self.Helios.Say(self, f"Prochaine alarme programmée: {alert.next_alarm}",0,1)
         else:
-            DxHelios.Say(self, f"{alert.nom}: pas d'envoi de mail avant: {alert.next_alarm}",0,1)
+            self.Helios.Say(self, f"{alert.nom}: pas d'envoi de mail avant: {alert.next_alarm}",0,1)
 
 
             
@@ -156,8 +165,6 @@ class MailCreator(object):
         message=f"Function '{alert.nom}': {message}"            
         
         self.alert_mail( subject, message)
-        
-        
 
 
         
@@ -175,9 +182,9 @@ class MailCreator(object):
 
             # Assign time for the next alert
             alert.next_alarm = datetime.now() + timedelta(minutes=alert.delay_alarm)
-            DxHelios.Say(self, f"Prochaine alarme programmée: {alert.next_alarm}",0,1)
+            self.Helios.Say(self, f"Prochaine alarme programmée: {alert.next_alarm}",0,1)
         else:
-            DxHelios.Say(self, f"{alert.nom}: pas d'envoi de mail avant: {alert.next_alarm}",0,1)
+            self.Helios.Say(self, f"{alert.nom}: pas d'envoi de mail avant: {alert.next_alarm}",0,1)
 
 
 

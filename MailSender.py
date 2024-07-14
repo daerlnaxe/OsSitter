@@ -11,7 +11,7 @@ Notes:
 import smtplib
 from datetime import datetime
 from typing import List
-from DxHelios import DxHelios
+#from DxHelios import DxHelios
 
 
 
@@ -160,11 +160,12 @@ class Mail_Block:
 """
 """
 class Mails:
+    
 #    def Send(self, subject:str ,message: str, sender: str, receiver : list, receiverCC:list = None, receiverCCI:list = None):
     def Send(self, sender: str, subject:str ,message: str, mail_params:Mail_Block ):
         if mail_params.mute_mode:
-            DxHelios.Say(self, f"----> MuteMode: Envoi annulé pour {subject}")
-            return
+           return f"----> MuteMode: Envoi annulé pour {subject}"
+            
         
         msg = EmailMessage()
 
@@ -176,7 +177,7 @@ class Mails:
         if mail_params.cc:
             msg['CC'] = ",".join(mail_params.get_ccList())
         
-        DxHelios.Say(self, mail_params.cci)
+        
         if mail_params.cci:
             #msg['CCI']=",".join(receiverCCI)
             msg['CCI']=",".join(mail_params.get_cciList())
@@ -204,4 +205,4 @@ class Mails:
         mailserver.send_message(msg)
         mailserver.quit()
 
-        DxHelios.Say(self, f"----- Envoi de mail {subject}")
+        return f"----- Envoi de mail {subject}"

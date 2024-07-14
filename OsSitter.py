@@ -33,7 +33,7 @@ from MailCreator import MailCreator
 
 
 class OsSitter(object):
-    __version="a5.3"
+    __version="a5.5"
 
     # Used to quit loop
     __stopped=False
@@ -43,6 +43,16 @@ class OsSitter(object):
 
     # idk
     _instance = None       # Attribut statique de classe
+    
+    Helios=None
+        #return self.__helios
+        
+    #@Helios.setter
+    #def Helios(self, value):
+    #    self.__helios = value
+
+        
+    
     @property
     def timeFormat(self):
         return "%Y-%m-%d %H:%M:%S"
@@ -60,9 +70,15 @@ class OsSitter(object):
     def debugMode(self):
         return self.__debugMode
     
+    #@property
+    #def mail_params(self):
+    #    return self.__mail_params
+    
+    # Object to send mails
     @property
-    def mail_params(self):
-        return self.__mail_params
+    def mailer(self):
+        return self.__mailer
+    
     
     @property
     def alerts(self):
@@ -78,10 +94,7 @@ class OsSitter(object):
     def fction(self):
         return self.__fction
         
-    # Object to send mails
-    @property
-    def mailer(self):
-        return self.__mailer
+
 
     #debugMode=None
     
@@ -93,23 +106,23 @@ class OsSitter(object):
         #global is_shutdown
         
         #-print(frame)
-        DxHelios.Say(self, frame)
+        self.Helios.Say(self, frame)
         #-print(signum)
-        DxHelios.Say(self, signum)
+        self.Helios.Say(self, signum)
         
         #is_shutdown = True
         #-print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_func')
-        DxHelios.Say(self, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_func')
+        self.Helios.Say(self, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_func')
     
 
     def term_method(self, signum, frame):
         #-print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_method')
-        DxHelios.Say(self, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_method')
+        self.Helios.Say(self, '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SIGTERM: term_method')
         
         self.mailer.normal_mail("sigterm")
 
         #-print(f"------------ Envoi de mail SIGTERM")
-        DxHelios.Say(self, f"------------ Envoi de mail SIGTERM")
+        self.Helios.Say(self, f"------------ Envoi de mail SIGTERM")
         self.__stopped=True
      
 
@@ -128,18 +141,18 @@ class OsSitter(object):
     """
     def __init__(self):
         # Prez
-        DxHelios.Say(self, '#'*52)
-        DxHelios.Say(self, '#' + ' '*50 + '#')
+        self.Helios.Say(self, '#'*52)
+        self.Helios.Say(self, '#' + ' '*50 + '#')
         
         #OsSitter: 8 chars
-        DxHelios.Say(self, '#' +' '*17 +  f"OsSitter - v{self.__version}" +' '*17+ '#')
-        DxHelios.Say(self, '#' + ' '*50 + '#')
-        DxHelios.Say(self, '#'*52)
+        self.Helios.Say(self, '#' +' '*17 +  f"OsSitter - v{self.__version}" +' '*17+ '#')
+        self.Helios.Say(self, '#' + ' '*50 + '#')
+        self.Helios.Say(self, '#'*52)
         
         self.InitLanguage()
         
         
-        DxHelios.Say(self, "{} {}".format(lang.get('init_time'),datetime.now().strftime(self.timeFormat)));
+        self.Helios.Say(self, "{} {}".format(lang.get('init_time'),datetime.now().strftime(self.timeFormat)));
         #print("Initialisation : {}".format(datetime.now().strftime(self.timeFormat)))
    
         # Check OS
@@ -150,18 +163,23 @@ class OsSitter(object):
             signal.signal(signal.SIGTERM, self.term_method)
             self.__osDetected="linux"
             
-        DxHelios.Say(self, f"{lang.get('det_os')}: {self.osDetected}", ind_mess= 1)
+        self.Helios.Say(self, f"{lang.get('det_os')}: {self.osDetected}", ind_mess= 1)
 
         # Load and init configuration
         self.InitConfig()
-        if self.mail_params.mute_mode:
-            DxHelios.Warning(self, lang.get('warning_mutemode'))
+        
+        # Warning if mute mode activated
+        #if self.mail_params.mute_mode:
+        if self.config.parameters.mail.mute_mode:
+            self.Helios.Warning(self, lang.get('warning_mutemode'))
 
         
         # Initialisation des objets
         self.__srvc=Service(lang, self.osDetected)
+        self.srvc.Helios=self.Helios
+        
         self.__fction=Function(lang, self.osDetected)
-
+        self.fction.Helios=self.Helios
         
 
     """ Initialize Language
@@ -173,9 +191,9 @@ class OsSitter(object):
             with open(fileName, "r") as read_file:
                 lang = json.load(read_file)
                 
-            DxHelios.Say(self, f"{lang.get('load_lang')}: {lang.get('language')} -  v{lang.get('version')}", ind_mess= 1)
+            self.Helios.Say(self, f"{lang.get('load_lang')}: {lang.get('language')} -  v{lang.get('version')}", ind_mess= 1)
         else:
-            DxHelios.Say(self, f"{lang.get('load_newlang')}: {lang.get('language')} -  v{lang.get('version')}", ind_mess= 1)
+            self.Helios.Say(self, f"{lang.get('load_newlang')}: {lang.get('language')} -  v{lang.get('version')}", ind_mess= 1)
             try:
                 with open(fileName, "r") as read_file:
                     lang = json.load(read_file)                   
@@ -183,7 +201,7 @@ class OsSitter(object):
                     os.rename("./new-lang.json", "./currentlang.json")
                     
             except Exception as exc:
-                DxHelios.Error(self,f"{lang.get('err_langload')}")
+                self.Helios.Error(self,f"{lang.get('err_langload')}")
                 print(exc)
                 return False
 
@@ -198,13 +216,16 @@ class OsSitter(object):
         # Chargement de la configuration
         if not reload:
             if not os.path.isfile(filePath):
+                self.Helios.Say("Config", f"Création du fichier de configuration: {filePath}",1,1)
                 Config.CF_Builder(filePath)
                 
-            DxHelios.Say(self, f"{lang.get('load_cfg')}", ind_mess= 1)
+            self.Helios.Say(self, f"{lang.get('load_cfg')}", ind_mess= 1)
+            
+            self.Helios.Say("Config", f"Chargement du fichier de configuration: {filePath}",1,1)
             self.__config= Config.Factory(filePath)
         # Load a new config file
         else:  
-            DxHelios.Say(self, f"{lang.get('load_newcfg')}", ind_mess= 1)
+            self.Helios.Say(self, f"{lang.get('load_newcfg')}", ind_mess= 1)
             try:
                 self.__config= Config.Factory(filePath)
                 
@@ -218,7 +239,7 @@ class OsSitter(object):
                 self.mailer.normal_mail("reloadconf")
 
             except Exception as exc:
-                DxHelios.Error(self,f"{lang.get('err_cfgload')}", exc)
+                self.Helios.Error(self,f"{lang.get('err_cfgload')}", exc)
                 print(exc)
                 self.mailer.normal_mail("reloadconffailed")
                 return False
@@ -228,9 +249,12 @@ class OsSitter(object):
         # Assignation
         #self.__srv_params=self.config.parameters
         self.__debugMode= self.config.parameters.debug        
-        self.__mail_params =  self.config.parameters.mail
+        #self.__mail_params =  self.config.parameters.mail
         self.__alerts =  self.config.alerts
+        
+        # mailer
         self.__mailer=MailCreator(lang, self.config.parameters)
+        self.mailer.Helios=self.Helios        
         self.mailer.debugMode=self.debugMode
         
         # Set the next time alert
@@ -257,26 +281,29 @@ class OsSitter(object):
     """ Self Test 
     """
     def test(self):
-        DxHelios.Title(self, "Tests")        
-        DxHelios.Say(self, lang.get('lnch_tests'))
+        self.Helios.Title(self, "Tests")        
+        self.Helios.Say(self, lang.get('lnch_tests'))
+        mail_params = self.config.parameters.mail
         
+       
         # config
         if self.debugMode:            
-            DxHelios.ShowParams(self, lang.get('repr_conf'), self, self.config, True)
+            self.Helios.ShowParams(self, lang.get('repr_conf'), self, self.config, True)
             #print("\tReprésentation de la configuration: ",self.config.__repr__()) # fonctionnel
-            DxHelios.ShowParams(self, lang.get('repr_params'), self, self.config.parameters, True)
-            DxHelios.ShowParams(self, lang.get('repr_alerts'), self, self.alerts, True)
-            DxHelios.ShowParams(self, lang.get('repr_mails'), self, self.mail_params, True)
+            self.Helios.ShowParams(self, lang.get('repr_params'), self, self.config.parameters, True)
+            self.Helios.ShowParams(self, lang.get('repr_mails'), self, self.config.parameters.mail, True)
+            self.Helios.ShowParams(self, lang.get('repr_alerts'), self, self.alerts, True)
 
         
         # mails
         if self.debugMode:
             # Tests for mails content
-            old_mute_mode= self.mail_params.mute_mode
+            old_mute_mode= mail_params.mute_mode
+            
             try:
-                DxHelios.Debug(self,f"Mails: {self.mail_params}")
+                self.Helios.Debug(self,f"Mails: {mail_params}")
                 
-                self.mail_params.mute_mode=True
+                mail_params.mute_mode=True
 
                 # normal
                 
@@ -289,12 +316,14 @@ class OsSitter(object):
                 self.mailer.mail_stoppedservice(pseudoalert)
                 self.mailer.mail_restartedservice(pseudoalert)
 
-                DxHelios.Debug(self, lang.get("mail_testsok"))
+                self.Helios.Debug(self, lang.get("mail_testsok"))
             except Exception as exc:
-                DxHelios.Error(self, lang.get('mail_testsfail'), exc)
+                self.Helios.Error(self, lang.get('mail_testsfail'), exc)
                 return False
             
-            self.mail_params.mute_mode=old_mute_mode
+            mail_params.mute_mode=old_mute_mode
+            
+           
         
         # Check alerts 
         for alert in self.config.alerts:
@@ -302,8 +331,7 @@ class OsSitter(object):
                 # Verify if service exists
                 alert.state=self.srvc.checkname(alert.nom)
 
-                
-                    
+                   
         # Test mail - if everything is ok
         self.mailer.normal_mail("just_a_test")
         
@@ -315,16 +343,18 @@ class OsSitter(object):
     """ Begining
     """
     def main(self):
+        mail_params = self.config.parameters.mail
+
         self.mailer.normal_mail("supervision_started")
 
         # Register to intercept ctrl+c
         #linux < useless if decorator used
         atexit.register(self.ACiaoi)
     
-        DxHelios.Jump()
-        DxHelios.Title(self, "Run")        
+        self.Helios.Jump()
+        self.Helios.Title(self, "Run")        
 
-        DxHelios.Say(self, "{} : {}".format(lang.get('starting'),datetime.now().strftime(self.timeFormat)))
+        self.Helios.Say(self, "{} : {}".format(lang.get('starting'),datetime.now().strftime(self.timeFormat)))
 
         """
         import inspect
@@ -337,7 +367,7 @@ class OsSitter(object):
             #result = map (lambda x:x['address'], mail_params.to)
 
         while(not self.__stopped):
-            DxHelios.Say(self,"{} {}".format(lang.get('time'),datetime.now()))
+            self.Helios.Say(self,"{} {}".format(lang.get('time'),datetime.now()))
             
             # Force to reload a new configuration file
             if os.path.isfile("./new-config.json"):
@@ -363,7 +393,7 @@ class OsSitter(object):
             for alert in self.config.alerts:
                 # Debug Mode -> show alert informations
                 if self.debugMode:                    
-                    DxHelios.Debug(self,f"{lang.get('next_exec')} {alert.nom}: {alert.next_execution}")
+                    self.Helios.Debug(self,f"{lang.get('next_exec')} {alert.nom}: {alert.next_execution}")
 
                 # Traitement de l'alerte
                 ## Common / Begin
@@ -372,10 +402,10 @@ class OsSitter(object):
                     old_state=alert.state
                     print(alert.next_execution)
                     if  datetime.now() >= alert.next_execution :            
-                        DxHelios.Say(self, f"{lang.get('alert_handl')} {alert.nom} {lang.get('typeof')}: {alert.typeA}",0,1)
+                        self.Helios.Say(self, f"{lang.get('alert_handl')} {alert.nom} {lang.get('typeof')}: {alert.typeA}",0,1)
                     # No check                    
                     else:
-                        DxHelios.Say(self, f"{lang.get('service_nextchk')} {alert.nom}: {alert.next_execution}",0,1)
+                        self.Helios.Say(self, f"{lang.get('service_nextchk')} {alert.nom}: {alert.next_execution}",0,1)
                 
                 
                 
@@ -394,17 +424,17 @@ class OsSitter(object):
                     # Alerting
                     ## Etat ok
                     if old_state and alert.state:
-                        DxHelios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_ok')}",0,1)
+                        self.Helios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_ok')}",0,1)
                     ## Service revenu
                     elif old_state is False and alert.state:                    
-                        DxHelios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_rst')}",0,1)
+                        self.Helios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_rst')}",0,1)
                         self.mailer.mail_restartedservice( alert)       
 
                         alert.next_alarm=None
                         
                     ## Service stoppé
                     elif alert.state is False:  
-                        DxHelios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_stpd')}",0,1)
+                        self.Helios.Say(self,f"{lang.get('service')} {alert.nom}: {lang.get('state_stpd')}",0,1)
                         self.mailer.mail_stoppedservice( alert)
                     ## Autre
                     else:
@@ -424,18 +454,18 @@ class OsSitter(object):
                     # Alerting
                     ## Etat ok
                     if old_state and alert.state:                        
-                        DxHelios.Say(self,f"{alert.nom}, stat supérieure à {alert.trigger}: {res[1]}",0,1)
+                        self.Helios.Say(self,f"{alert.nom}, stat supérieure à {alert.trigger}: {res[1]}",0,1)
                     ## Etat de la fonction, restauré
                     elif old_state is False and alert.state:
                         msg=f"stat revenue sous {alert.trigger} : {res[1]}"
-                        DxHelios.Say(self, f"{alert.nom} - {msg}",0,1)
+                        self.Helios.Say(self, f"{alert.nom} - {msg}",0,1)
                         self.mailer.mail_functionrestaured( alert, msg, "Restauration")  
 
                         alert.next_alarm=None
                     ## Etat de la fonction, critique
                     elif alert.state is False:  
                         msg=f"alarme --> stat inférieure à {alert.trigger}: {res[1]}"
-                        DxHelios.Say(self, f"{alert.nom} - {msg}",0,1)
+                        self.Helios.Say(self, f"{alert.nom} - {msg}",0,1)
                         self.mailer.mail_function( alert, msg, "Alerte")
                     ## Autre
                     else:
@@ -447,25 +477,25 @@ class OsSitter(object):
                 ## Common / Next Execution
                 if (alert.typeA =="service" or alert.typeA == "function"):
                     self.config.set_nextexecution(alert)
-                    DxHelios.Say(self, f"{lang.get('next_execset')}  {alert.next_execution} ({alert.timer})",0,1 )
+                    self.Helios.Say(self, f"{lang.get('next_execset')}  {alert.next_execution} ({alert.timer})",0,1 )
 
 
                 # Gestion du check    
                 if self.debugMode:
-                    DxHelios.Debug(self, f"{lang.get('states')}, check: {alert.state} | old_state: {old_state}")
+                    self.Helios.Debug(self, f"{lang.get('states')}, check: {alert.state} | old_state: {old_state}")
 
 
 
                     
             # Time to Sleep (see 
-            DxHelios.Say(self,f"{lang.get('sleep_param')} {self.config.parameters.sleeper * 60 }s\n\n")
+            self.Helios.Say(self,f"{lang.get('sleep_param')} {self.config.parameters.sleeper * 60 }s\n\n")
             time.sleep(self.config.parameters.sleeper * 60)
             
     
 
     # body of destructor
     def __del__(self):
-        DxHelios.Title(self, f"{lang.get('destruct')} {self.__class__.__name__}")
+        OsSitter.Helios.Title(self, f"{lang.get('destruct')} {self.__class__.__name__}")
         print("OsSitter Stopped")
 
 
@@ -474,13 +504,16 @@ Starting point
 """
 if __name__ == '__main__':    
     ############ temporaire #############
-    DxHelios.static_output=0
-    DxHelios.set_outpufile("./ossitter.log")
+    OsSitter.Helios=DxHelios()
+    OsSitter.Helios.output_mode=0
+    OsSitter.Helios.set_outpufile("./ossitter.log")
+    
+    
     sup = OsSitter()
-    Helios=DxHelios()
     
     if not sup.test():
-        DxHelios.Say("__main__", "Tests echoués")
+        sup.Helios.Say("__main__", "Tests echoués")
+        print("__main__", "Tests echoués")
         sys.exit()
     
     # Sys.exit to signal why
