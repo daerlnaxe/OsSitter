@@ -27,7 +27,11 @@ class DxHelios:
             return who.__class__.__name__
     
     
-    
+    """
+    Define the output:
+        0: Write to file
+        1: Write to screen
+    """
     def write_message(self, message):
         if(self.output_mode==0):
             if(type(message) != str):

@@ -33,7 +33,7 @@ from MailCreator import MailCreator
 
 
 class OsSitter(object):
-    __version="a5.5"
+    __version="a5.60"
 
     # Used to quit loop
     __stopped=False
@@ -52,10 +52,15 @@ class OsSitter(object):
     #    self.__helios = value
 
         
-    
+    # Return horodating for the log entries
     @property
-    def timeFormat(self):
+    def timeHoroDLog(self):
         return "%Y-%m-%d %H:%M:%S"
+
+    # Return horodating for the file log
+    @property
+    def timeHoroDFile(self):
+        return "%Y%m%D_%H%M%S"
 
     @property
     def osDetected(self):
@@ -152,8 +157,8 @@ class OsSitter(object):
         self.InitLanguage()
         
         
-        self.Helios.Say(self, "{} {}".format(lang.get('init_time'),datetime.now().strftime(self.timeFormat)));
-        #print("Initialisation : {}".format(datetime.now().strftime(self.timeFormat)))
+        self.Helios.Say(self, "{} {}".format(lang.get('init_time'),datetime.now().strftime(self.timeHoroDLog)));
+        #print("Initialisation : {}".format(datetime.now().strftime(self.timeHoroDLog)))
    
         # Check OS
         # its win32, maybe there is win64 too?
@@ -354,7 +359,7 @@ class OsSitter(object):
         self.Helios.Jump()
         self.Helios.Title(self, "Run")        
 
-        self.Helios.Say(self, "{} : {}".format(lang.get('starting'),datetime.now().strftime(self.timeFormat)))
+        self.Helios.Say(self, "{} : {}".format(lang.get('starting'),datetime.now().strftime(self.timeHoroDLog)))
 
         """
         import inspect
@@ -506,7 +511,9 @@ if __name__ == '__main__':
     ############ temporaire #############
     OsSitter.Helios=DxHelios()
     OsSitter.Helios.output_mode=0
-    OsSitter.Helios.set_outpufile("./ossitter.log")
+    
+    # Set the log file for the start
+    OsSitter.Helios.set_outpufile(f"./{self.timeHoroDFile}-ossitter.log")
     
     
     sup = OsSitter()
