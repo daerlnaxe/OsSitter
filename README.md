@@ -28,8 +28,7 @@ It uses a simple json language file to translate as you wish.
 
 
 ## Last version
-[Alpha 5](#alpha-5)
-
+[Alpha 5.60](./Doc/dev.md#alpha-5.60)
 
 # Features
 - Watching services

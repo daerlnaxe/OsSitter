@@ -19,6 +19,10 @@
 
 
 # Changelog
+## Alpha 5.60
+2025/11/02
+- Introducing horodating for the log filename
+
 ## Alpha 5.1
 06/2024
 - New feature: "functions"
