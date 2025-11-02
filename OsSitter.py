@@ -512,11 +512,13 @@ if __name__ == '__main__':
     OsSitter.Helios=DxHelios()
     OsSitter.Helios.output_mode=0
     
-    # Set the log file for the start
-    OsSitter.Helios.set_outpufile(f"./{self.timeHoroDFile}-ossitter.log")
+ 
     
     
     sup = OsSitter()
+
+   # Set the log file for the start
+    OsSitter.Helios.set_outpufile(f"./{sup.timeHoroDFile}-ossitter.log")
     
     if not sup.test():
         sup.Helios.Say("__main__", "Tests echoués")
