@@ -14,12 +14,16 @@ class DxHelios:
     output_mode=1
     
     fileToWrite=None
-    
+    filePath=""
     
 
 
     def set_outpufile(self,file):
-        DxHelios.fileToWrite = open(file, "a")
+        if (DxHelios.fileToWrite):
+            DxHelios.fileToWrite.close()
+            
+        DxHelios.filePath=file
+        DxHelios.fileToWrite = open(DxHelios.filePath, "a")
         
 
     
@@ -144,6 +148,9 @@ class DxHelios:
             self.fileToWrite.close()
         
         print("Fermeture du fichier de log.")
+
+    
+
 
 
     # destructor

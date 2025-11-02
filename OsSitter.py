@@ -388,13 +388,27 @@ class OsSitter(object):
                 self.InitLanguage("./new-lang.json",reload=True)
 
 
-            
+            # Check logfile size
+            if self.debugMode:           
+                start_time = time.time()
+
+            file_size = os.path.getsize(DxHelios.filePath)
+
+            if self.debugMode:           
+                end_time = time.time()
+                elapsed_time = (end_time - start_time) * 1000  # Convertir en millisecondes
+                print(f"File size: {file_size} bytes")
+                print(f"Time taken: {elapsed_time:.6f} ms")
+
+            if file_size >= 11264: #10485760                            
+                # Modify the log file to write
+                self.Helios.set_outpufile(f"./{TimeModule.getNowHoroDFile()}-ossitter.log")
 
             
             # Stop All
             if self.config.parameters.stop==True:
                 self.__stopped=True
-                break;
+                break
 
             
             # Alerts
