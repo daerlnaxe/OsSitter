@@ -16,7 +16,7 @@ It gives possibilities:
 - Doesn't launch immediatly but enable, to let you configure.
 - Almost a generic installer
 
-!!! Warning I don't think there is people interested for the while but wait next release, i need to verify again and again there is no error. I made a lot of tests, but just in case...
+!!! Warning I don't have a lot of time to develop but this program run under a production environment more than 1 year and is very helpful. I stay in alpha because i have a lot of things to add, and i prefer to warn people juste in case ...
 
 ## About
  Watch behavior of Operating system
