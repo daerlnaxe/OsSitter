@@ -1,5 +1,6 @@
 #!/bin/bash
 # coding: utf-8
+# version 1.1
 
 # Make me executable by using 'sudo chmod +x LinuxInstaller.sh'
 # Then run me by using 'sudo ./LinuxInstaller.sh'
@@ -75,7 +76,7 @@ echo "$ch_user created"
 fi
 
 # Installation folder
-installFolder="/home/$ch_user"
+installFolder="/opt/ossitter"
 read -p "Current install folder is $installFolder, keep it ? (*/n)" res
 
 if [[ $res == 'n' ]]
