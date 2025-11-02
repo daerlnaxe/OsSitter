@@ -160,7 +160,7 @@ class OsSitter(object):
         self.InitLanguage()
         
         #datetime.now().strftime(self.timeHoroDLog)
-        self.Helios.Say(self, "{} {}".format(lang.get('init_time'), TimeModule.getNowHoroDLog))
+        self.Helios.Say(self, "{} {}".format(lang.get('init_time'), TimeModule.getNowHoroDLog()))
         #print("Initialisation : {}".format(datetime.now().strftime(self.timeHoroDLog)))
    
         # Check OS
@@ -266,7 +266,7 @@ class OsSitter(object):
         self.mailer.debugMode=self.debugMode
         
         # Set the next time alert
-        self.__config.InitAlerts(TimeModule.getNowHoroDLog)
+        self.__config.InitAlerts(TimeModule.getNowHoroDLog())
         
 
         return True
@@ -362,7 +362,7 @@ class OsSitter(object):
         self.Helios.Jump()
         self.Helios.Title(self, "Run")        
 
-        self.Helios.Say(self, "{} : {}".format(lang.get('starting'),TimeModule.getNowHoroDLog))
+        self.Helios.Say(self, "{} : {}".format(lang.get('starting'),TimeModule.getNowHoroDLog()))
 
         """
         import inspect
@@ -375,12 +375,12 @@ class OsSitter(object):
             #result = map (lambda x:x['address'], mail_params.to)
 
         while(not self.__stopped):
-            self.Helios.Say(self,"{} {}".format(lang.get('time'),TimeModule.getNowHoroDLog))
+            self.Helios.Say(self,"{} {}".format(lang.get('time'),TimeModule.getNowHoroDLog()))
             
             # Force to reload a new configuration file
             if os.path.isfile("./new-config.json"):
                 self.InitConfig("./new-config.json",reload=True)
-                self.__config.InitAlerts(TimeModule.getNowHoroDLog)
+                self.__config.InitAlerts(TimeModule.getNowHoroDLog())
                 
 
             # Force to reload a new language file
@@ -409,7 +409,7 @@ class OsSitter(object):
                 if (alert.typeA =="service" or alert.typeA == "function"):
                     old_state=alert.state
                     print(alert.next_execution)
-                    if  TimeModule.getNowHoroDLog >= alert.next_execution :            
+                    if  TimeModule.getNowHoroDLog() >= alert.next_execution :            
                         self.Helios.Say(self, f"{lang.get('alert_handl')} {alert.nom} {lang.get('typeof')}: {alert.typeA}",0,1)
                     # No check                    
                     else:
@@ -516,7 +516,7 @@ if __name__ == '__main__':
     OsSitter.Helios.output_mode=0
     
     # Set the log file for the start
-    OsSitter.Helios.set_outpufile(f"./{TimeModule.timeHoroDFile}-ossitter.log")
+    OsSitter.Helios.set_outpufile(f"./{TimeModule.getNowHoroDFile()}-ossitter.log")
     
     
     sup = OsSitter()
