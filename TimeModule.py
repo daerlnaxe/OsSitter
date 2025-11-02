@@ -15,6 +15,8 @@ timeHoroDFile = "%Y%m%d_%H%M%S"
 def getNowHoroDLog():        
         return datetime.now().strftime(timeHoroDLog)
 
+def getNowHoroD():
+        return datetime.now()
 
 def getNowHoroDFile():
         return datetime.now().strftime(timeHoroDFile)

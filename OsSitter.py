@@ -266,7 +266,7 @@ class OsSitter(object):
         self.mailer.debugMode=self.debugMode
         
         # Set the next time alert
-        self.__config.InitAlerts(TimeModule.getNowHoroDLog())
+        self.__config.InitAlerts(TimeModule.getNowHoroD())
         
 
         return True
@@ -380,7 +380,7 @@ class OsSitter(object):
             # Force to reload a new configuration file
             if os.path.isfile("./new-config.json"):
                 self.InitConfig("./new-config.json",reload=True)
-                self.__config.InitAlerts(TimeModule.getNowHoroDLog())
+                self.__config.InitAlerts(TimeModule.getNowHoroD())
                 
 
             # Force to reload a new language file
@@ -409,7 +409,7 @@ class OsSitter(object):
                 if (alert.typeA =="service" or alert.typeA == "function"):
                     old_state=alert.state
                     print(alert.next_execution)
-                    if  TimeModule.getNowHoroDLog() >= alert.next_execution :            
+                    if  TimeModule.getNowHoroD() >= alert.next_execution :            
                         self.Helios.Say(self, f"{lang.get('alert_handl')} {alert.nom} {lang.get('typeof')}: {alert.typeA}",0,1)
                     # No check                    
                     else:

@@ -56,7 +56,7 @@
   - mutemode: don't send mail (used to test algorithm)
   - smtp
     - smtpstring: string to connect to your smtp server
-        - outlook: smtp-mail.outlook.com
+        - outlook: smtp-mail.outlook.com (no longer works, refuse "basic auth")
     - auth : use it if you need a password to use a smtp server
 
 <br>

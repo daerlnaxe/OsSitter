@@ -22,6 +22,8 @@
 ## Alpha 5.60
 2025/11/02
 - Introducing horodating for the log filename
+- Correction du bug d'écriture log à la destruction 
+
 
 ## Alpha 5.1
 06/2024

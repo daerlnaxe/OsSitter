@@ -190,8 +190,11 @@ class Mails:
         # Debug
         #print("smtpobj",mail_params.smtpobj.__repr__())
         # Préparation du serveur
+        print(f"Port: {mail_params.smtpobj.port}, Login: {mail_params.smtpobj.login}, password: {mail_params.smtpobj.password}")
         mailserver = smtplib.SMTP(mail_params.smtpobj.smtpstring, mail_params.smtpobj.port)
-        mailserver.ehlo()
+        print("mailserver passé")
+        #mailserver.set_debuglevel(1)  # Pour déboguer si nécessaire
+
         
         
         # Only if authentification needed
@@ -200,6 +203,9 @@ class Mails:
             mailserver.ehlo()
             # Penser à utiliser un  Mot de passe d'application pour outlook, etc...
             mailserver.login(mail_params.smtpobj.login, mail_params.smtpobj.password)
+        else:
+            mailserver.ehlo()
+
 
         #Dernières versions de Python
         mailserver.send_message(msg)
