@@ -6,6 +6,7 @@ Version: alpha 4.1
 Required Python 3.6
 """
 import traceback
+import atexit
 
 class DxHelios:
     # fichier=0, console=1
@@ -15,8 +16,10 @@ class DxHelios:
     fileToWrite=None
     
     
+
+
     def set_outpufile(self,file):
-        DxHelios.fileToWrite = open(file, "a");
+        DxHelios.fileToWrite = open(file, "a")
         
 
     
@@ -43,6 +46,11 @@ class DxHelios:
             print(message)
 
     
+    def __init__(self):        
+        # Enregistrer une fonction de nettoyage à la fin
+        atexit.register(self.cleanup)
+
+
     
     # Write like 'who {tab} | {tab} message'
     def Say (self, who, message: str, ind_class=0, ind_mess=0):   
@@ -129,7 +137,15 @@ class DxHelios:
         self.SayRaw(message)
         self.DrawLine()
 
+    def cleanup(self):
+        """Fonction de nettoyage appelée lors de la sortie du programme"""
+        if self.fileToWrite and not self.fileToWrite.closed:
+            self.Title(self, f"Destruction de {self.__class__.__name__} -- Sortie ???")
+            self.fileToWrite.close()
+        
+        print("Fermeture du fichier de log.")
+
 
     # destructor
-    def __del__(self):
-        fileToWrite.close()
+    #def __del__(self):
+        #Title(self, f"Destruction de {self.__class__.__name__} -- Sortie ???")

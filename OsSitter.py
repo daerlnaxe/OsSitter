@@ -503,8 +503,8 @@ class OsSitter(object):
 
     # body of destructor
     def __del__(self):
-        OsSitter.Helios.Title(self, f"{lang.get('destruct')} {self.__class__.__name__}")
         print("OsSitter Stopped")
+        
 
 
 """
