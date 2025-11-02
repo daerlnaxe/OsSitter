@@ -23,7 +23,9 @@ from Config import Config
 from Check_Service import Service
 from Check_Function import Function
 #from SendMail import Mails
-from datetime import datetime, timedelta
+#from datetime import datetime, timedelta
+import time
+
 # Used to detect when stopped
 import atexit 
 # User to intercept sigkill and ...
@@ -51,7 +53,7 @@ class OsSitter(object):
     #def Helios(self, value):
     #    self.__helios = value
 
-        
+    '''
     # Return horodating for the log entries
     @property
     def timeHoroDLog(self):
@@ -61,6 +63,7 @@ class OsSitter(object):
     @property
     def timeHoroDFile(self):
         return "%Y%m%D_%H%M%S"
+    '''        
 
     @property
     def osDetected(self):
@@ -512,13 +515,13 @@ if __name__ == '__main__':
     OsSitter.Helios=DxHelios()
     OsSitter.Helios.output_mode=0
     
- 
+    # Set the log file for the start
+    OsSitter.Helios.set_outpufile(f"./{time.timeHoroDFile}-ossitter.log")
     
     
     sup = OsSitter()
 
-   # Set the log file for the start
-    OsSitter.Helios.set_outpufile(f"./{sup.timeHoroDFile}-ossitter.log")
+
     
     if not sup.test():
         sup.Helios.Say("__main__", "Tests echoués")
