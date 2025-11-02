@@ -53,6 +53,7 @@ It uses a simple json language file to translate as you wish.
     - Linux
         - SIGTERM
 - Tests on init
+- Log Rotation > 10Mo 
 - Send about its health mail when:
 	- Loaded
 	- Stopped by [CRTL]+[C]
